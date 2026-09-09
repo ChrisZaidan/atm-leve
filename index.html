@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Pare de improvisar quando sua mandíbula incomoda. Tenha protocolos guiados, check-ins e orientações seguras para cuidar da sua ATM todos os dias.">
+    <title>ATM Leve — Seu suporte diário para DTM, bruxismo e tensão facial</title>
+    
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ============================================
+           SISTEMA DE DESIGN — IDENTIDADE ATM LEVE
+           Fidelidade total ao app em chriszaidan.github.io/atm-leve
+           ============================================ */
+        
+        :root {
+            /* Cores exatas do app */
+            --bg: #fafaf8;
+            --surface: #ffffff;
+            --fg: #4a4a4a;
+            --muted: rgba(74, 74, 74, 0.7);
+            --border: #e8e6e1;
+            --accent: #D87554;
+            --secondary: #8DA9C4;
+            --shadow: rgba(74, 74, 74, 0.08);
+            
+            /* Tipografia */
+            --font-display: 'Crimson Pro', Georgia, serif;
+            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            
+            /* Espaçamentos */
+            --space-xs: 8px;
+            --space-sm: 16px;
+            --space-md: 24px;
+            --space-lg: 32px;
+            --space-xl: 48px;
+            --space-2xl: 64px;
+            --space-3xl: 96px;
+            
+            /* Bordas e sombras */
+            --radius: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
+            --shadow-sm: 0 2px 8px var(--shadow);
+            --shadow-md: 0 4px 16px var(--shadow);
+        }
+        
+        /* ============================================
+           RESET
+           ============================================ */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: var(--font-body);
+            background: var(--bg);
+            color: var(--fg);
+            line-height: 1.6;
+        }
+        
+        /* ============================================
+           TIPOGRAFIA
+           ============================================ */
+        
+        h1, h2, h3, h4 {
+            font-family: var(--font-display);
+            font-weight: 400;
+            line-height: 1.2;
+            color: var(--fg);
+        }
+        
+        h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            margin-bottom: var(--space-md);
+            font-weight: 300;
+        }
+        
+        h2 {
+            font-size: clamp(1.75rem, 4vw, 2.5rem);
+            margin-bottom: var(--space-md);
+            font-weight: 300;
+        }
+        
+        h3 {
+            font-size: clamp(1.25rem, 3vw, 1.5rem);
+            margin-bottom: var(--space-sm);
+        }
+        
+        p {
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .lead {
+            font-size: clamp(1.0625rem, 2vw, 1.25rem);
+            line-height: 1.8;
+            color: var(--muted);
+        }
+        
+        /* ============================================
+           LAYOUT
+           ============================================ */
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-md);
+        }
+        
+        .container-narrow {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 var(--space-md);
+        }
+        
+        section {
+            padding: var(--space-3xl) 0;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        /* ============================================
+           LOGO (idêntico ao app)
+           ============================================ */
+        
+        .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 300;
+            color: var(--fg);
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--surface);
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .logo-icon::after {
+            content: '';
+            width: 24px;
+            height: 12px;
+            border: 2px solid var(--accent);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+        }
+        
+        /* ============================================
+           BOTÕES (idênticos ao app)
+           ============================================ */
+        
+        .btn {
+            display: inline-block;
+            padding: var(--space-sm) var(--space-lg);
+            border: none;
+            border-radius: var(--radius);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px 12px rgba(216, 117, 84, 0.2);
+        }
+        
+        .btn-primary:hover {
+            background: #c66647;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(216, 117, 84, 0.3);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--fg);
+            border: 1.5px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        
+        .btn-large {
+            padding: 18px var(--space-xl);
+            font-size: 1.125rem;
+        }
+        
+        /* ============================================
+           CARDS (idênticos ao app)
+           ============================================ */
+        
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: var(--space-md);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .card-highlight {
+            border-color: var(--secondary);
+            background: linear-gradient(135deg, #f8fbff 0%, var(--surface) 100%);
+        }
+        
+        /* ============================================
+           HEADER
+           ============================================ */
+        
+        header {
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            padding: var(--space-md) 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: var(--space-lg);
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: var(--fg);
+            text-decoration: none;
+            font-size: 0.9375rem;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+        
+        /* ============================================
+           HERO
+           ============================================ */
+        
+        .hero {
+            min-height: 85vh;
+            display: flex;
+            align-items: center;
+            background: var(--bg);
+        }
+        
+        .hero-content {
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .hero-badge {
+            display: inline-block;
+            background: var(--secondary);
+            color: white;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 6px 14px;
+            border-radius: 20px;
+            margin-bottom: var(--space-lg);
+        }
+        
+        .cta-group {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: var(--space-xl);
+            margin-bottom: var(--space-md);
+        }
+        
+        .price-tag {
+            font-size: 0.9375rem;
+            color: var(--muted);
+            margin-top: var(--space-md);
+        }
+        
+        .price-highlight {
+            font-weight: 600;
+            color: var(--accent);
+            font-size: 1.125rem;
+        }
+        
+        /* ============================================
+           PROBLEMA / DOR
+           ============================================ */
+        
+        .pain-section {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .pain-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-md);
+            margin-top: var(--space-xl);
+        }
+        
+        .pain-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: var(--space-lg);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .pain-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .pain-icon {
+            font-size: 2.5rem;
+            margin-bottom: var(--space-md);
+            display: block;
+        }
+        
+        .pain-card h3 {
+            font-size: 1.125rem;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .pain-card p {
+            font-size: 0.9375rem;
+            color: var(--muted);
+        }
+        
+        /* ============================================
+           APP PREVIEW
+           ============================================ */
+        
+        .preview-section {
+            background: var(--bg);
+        }
+        
+        .preview-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-2xl);
+            align-items: center;
+            margin-top: var(--space-xl);
+        }
+        
+        .preview-text h2 {
+            margin-bottom: var(--space-md);
+        }
+        
+        .preview-text .lead {
+            margin-bottom: var(--space-lg);
+        }
+        
+        .preview-mockup {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: var(--space-md);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .preview-mockup iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: var(--radius);
+        }
+        
+        /* ============================================
+           FUNCIONALIDADES
+           ============================================ */
+        
+        .features-section {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--space-lg);
+            margin-top: var(--space-2xl);
+        }
+        
+        .feature-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: var(--space-lg);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            border-color: var(--secondary);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            margin-bottom: var(--space-md);
+            background: linear-gradient(135deg, #f8fbff 0%, var(--bg) 100%);
+            border: 2px solid var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+        }
+        
+        .feature-card h3 {
+            margin-bottom: var(--space-sm);
+        }
+        
+        .feature-card p {
+            font-size: 0.9375rem;
+            color: var(--muted);
+        }
+        
+        /* ============================================
+           SOS DESTAQUE
+           ============================================ */
+        
+        .sos-highlight {
+            background: linear-gradient(135deg, #fff5f2 0%, #ffe8e0 100%);
+            border: 2px solid var(--accent);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl) var(--space-lg);
+            margin: var(--space-3xl) auto;
+            max-width: 900px;
+            text-align: center;
+        }
+        
+        .sos-icon-large {
+            font-size: 4rem;
+            margin-bottom: var(--space-md);
+        }
+        
+        .sos-highlight h2 {
+            color: var(--accent);
+            margin-bottom: var(--space-md);
+        }
+        
+        /* ============================================
+           AUTORIDADE / DRA. VANESSA
+           ============================================ */
+        
+        .authority-section {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .authority-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: var(--space-2xl);
+            align-items: center;
+            margin-top: var(--space-xl);
+        }
+        
+        .doctor-photo {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid var(--accent);
+        }
+        
+        .doctor-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .photo-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--accent) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+            text-align: center;
+            padding: var(--space-md);
+        }
+        
+        .authority-text h3 {
+            color: var(--accent);
+            font-size: 1.5rem;
+            margin-bottom: var(--space-xs);
+        }
+        
+        .doctor-title {
+            font-size: 1.0625rem;
+            font-weight: 500;
+            margin-bottom: var(--space-md);
+            color: var(--muted);
+        }
+        
+        /* ============================================
+           PREÇO
+           ============================================ */
+        
+        .pricing-section {
+            background: var(--bg);
+        }
+        
+        .pricing-card {
+            max-width: 600px;
+            margin: var(--space-xl) auto 0;
+            background: var(--surface);
+            border: 2px solid var(--accent);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            text-align: center;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .pricing-badge {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 6px 14px;
+            border-radius: 20px;
+            margin-bottom: var(--space-md);
+        }
+        
+        .price-display {
+            margin: var(--space-xl) 0;
+        }
+        
+        .price-amount {
+            font-size: 3.5rem;
+            font-weight: 300;
+            font-family: var(--font-display);
+            color: var(--accent);
+            line-height: 1;
+        }
+        
+        .price-period {
+            font-size: 1.125rem;
+            color: var(--muted);
+            margin-top: var(--space-sm);
+        }
+        
+        .benefits-list {
+            list-style: none;
+            text-align: left;
+            margin: var(--space-xl) 0;
+            padding: 0;
+        }
+        
+        .benefits-list li {
+            padding: var(--space-sm) 0;
+            padding-left: 28px;
+            position: relative;
+            font-size: 1rem;
+        }
+        
+        .benefits-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+        
+        .guarantee-box {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: var(--space-md);
+            margin-top: var(--space-lg);
+            font-size: 0.9375rem;
+            color: var(--muted);
+        }
+        
+        /* ============================================
+           FAQ
+           ============================================ */
+        
+        .faq-section {
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+        }
+        
+        .faq-list {
+            max-width: 800px;
+            margin: var(--space-xl) auto 0;
+        }
+        
+        .faq-item {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: var(--space-sm);
+            overflow: hidden;
+        }
+        
+        .faq-item summary {
+            padding: var(--space-md);
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--fg);
+            list-style: none;
+            position: relative;
+            transition: background 0.3s ease;
+        }
+        
+        .faq-item summary::-webkit-details-marker {
+            display: none;
+        }
+        
+        .faq-item summary::after {
+            content: '+';
+            position: absolute;
+            right: var(--space-md);
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            color: var(--accent);
+            transition: all 0.3s ease;
+        }
+        
+        .faq-item[open] summary::after {
+            content: '−';
+        }
+        
+        .faq-item summary:hover {
+            background: var(--surface);
+        }
+        
+        .faq-content {
+            padding: 0 var(--space-md) var(--space-md);
+            color: var(--muted);
+            line-height: 1.7;
+        }
+        
+        /* ============================================
+           CTA FINAL
+           ============================================ */
+        
+        .final-cta {
+            background: linear-gradient(135deg, #fff5f2 0%, var(--bg) 100%);
+            border-top: 2px solid var(--accent);
+            text-align: center;
+        }
+        
+        /* ============================================
+           FOOTER
+           ============================================ */
+        
+        footer {
+            background: var(--fg);
+            color: white;
+            padding: var(--space-2xl) 0 var(--space-lg);
+        }
+        
+        .footer-content {
+            text-align: center;
+        }
+        
+        .footer-logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 300;
+            margin-bottom: var(--space-md);
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-lg);
+            margin: var(--space-lg) 0;
+            flex-wrap: wrap;
+            list-style: none;
+        }
+        
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            font-size: 0.9375rem;
+            transition: opacity 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            opacity: 1;
+        }
+        
+        .footer-disclaimer {
+            max-width: 800px;
+            margin: var(--space-lg) auto 0;
+            font-size: 0.875rem;
+            opacity: 0.6;
+            line-height: 1.6;
+        }
+        
+        .footer-copyright {
+            margin-top: var(--space-lg);
+            font-size: 0.875rem;
+            opacity: 0.5;
+        }
+        
+        /* ============================================
+           RESPONSIVIDADE
+           ============================================ */
+        
+        @media (max-width: 768px) {
+            section {
+                padding: var(--space-2xl) 0;
+            }
+            
+            .hero {
+                min-height: auto;
+                padding: var(--space-3xl) 0;
+            }
+            
+            .cta-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .preview-container,
+            .authority-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <nav class="container">
+            <a href="#" class="logo">
+                <div class="logo-icon"></div>
+                ATM Leve
+            </a>
+            <ul class="nav-links">
+                <li><a href="#problema">Problema</a></li>
+                <li><a href="#solucao">Solução</a></li>
+                <li><a href="#funcionalidades">Como funciona</a></li>
+                <li><a href="#preco">Preço</a></li>
+            </ul>
+            <a href="#preco" class="btn btn-primary">Começar agora</a>
+        </nav>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <span class="hero-badge">Suporte diário especializado</span>
+                <h1>Pare de improvisar quando sua mandíbula incomoda</h1>
+                <p class="lead">
+                    Tenha protocolos guiados, check-ins personalizados e orientações seguras 
+                    para cuidar da tensão facial, bruxismo e sinais da DTM no dia a dia.
+                </p>
+                
+                <div class="cta-group">
+                    <a href="#preco" class="btn btn-primary btn-large">Começar agora</a>
+                    <a href="https://chriszaidan.github.io/atm-leve/" target="_blank" class="btn btn-secondary btn-large">Ver demonstração</a>
+                </div>
+                
+                <p class="price-tag">
+                    Apenas <span class="price-highlight">R$ 24,90/mês</span> • Cancele quando quiser
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- DOR / PROBLEMA -->
+    <section class="pain-section" id="problema">
+        <div class="container-narrow text-center">
+            <h2>Você não está sozinha</h2>
+            <p class="lead">
+                Conviver com tensão facial, bruxismo e desconforto na ATM é cansativo. 
+                E muitas vezes, você não sabe o que fazer quando os sintomas aparecem.
+            </p>
+        </div>
+        
+        <div class="container">
+            <div class="pain-grid">
+                <div class="pain-card">
+                    <span class="pain-icon">😰</span>
+                    <h3>Acordar com a mandíbula cansada</h3>
+                    <p>E não saber se vai piorar durante o dia</p>
+                </div>
+                
+                <div class="pain-card">
+                    <span class="pain-icon">🤯</span>
+                    <h3>Apertar os dentes sem perceber</h3>
+                    <p>E só notar quando a tensão já está forte</p>
+                </div>
+                
+                <div class="pain-card">
+                    <span class="pain-icon">😣</span>
+                    <h3>Sentir que nada ajuda</h3>
+                    <p>E ficar testando coisas aleatórias que encontra</p>
+                </div>
+                
+                <div class="pain-card">
+                    <span class="pain-icon">😔</span>
+                    <h3>Viver com medo de travar</h3>
+                    <p>E não ter ninguém para te orientar na hora</p>
+                </div>
+                
+                <div class="pain-card">
+                    <span class="pain-icon">😖</span>
+                    <h3>Não entender os gatilhos</h3>
+                    <p>E repetir os mesmos hábitos que pioram tudo</p>
+                </div>
+                
+                <div class="pain-card">
+                    <span class="pain-icon">😞</span>
+                    <h3>Sentir que está improvisando</h3>
+                    <p>E gostaria de ter um caminho mais seguro</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PREVIEW DO APP -->
+    <section class="preview-section" id="solucao">
+        <div class="container">
+            <div class="preview-container">
+                <div class="preview-text">
+                    <h2>Agora você tem um caminho</h2>
+                    <p class="lead">
+                        O ATM Leve é o primeiro suporte diário inteligente para quem convive com 
+                        tensão facial, bruxismo e sinais de DTM.
+                    </p>
+                    <p class="lead">
+                        Com curadoria da Dra. Vanessa Silveira, especialista em DTM e dor orofacial.
+                    </p>
+                    <a href="https://chriszaidan.github.io/atm-leve/" target="_blank" class="btn btn-secondary">
+                        Testar demonstração →
+                    </a>
+                </div>
+                
+                <div class="preview-mockup">
+                    <iframe src="https://chriszaidan.github.io/atm-leve/" title="Preview ATM Leve"></iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FUNCIONALIDADES -->
+    <section class="features-section" id="funcionalidades">
+        <div class="container-narrow text-center">
+            <h2>O que você terá no ATM Leve</h2>
+            <p class="lead">
+                Tudo que você precisa para cuidar melhor da sua ATM, 
+                entender seus gatilhos e reduzir tensão facial no dia a dia.
+            </p>
+        </div>
+        
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📝</div>
+                    <h3>Check-in diário</h3>
+                    <p>
+                        Registre como você está todos os dias: dor, tensão, sono, estresse, 
+                        apertamento. O app aprende com você.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Recomendações personalizadas</h3>
+                    <p>
+                        Com base no seu check-in, você recebe o protocolo mais adequado 
+                        para o seu momento.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⏱️</div>
+                    <h3>Protocolos rápidos</h3>
+                    <p>
+                        Rotinas de 2 a 7 minutos: relaxamento mandibular, respiração, 
+                        automassagem segura, rotina noturna.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>Rastreador de gatilhos</h3>
+                    <p>
+                        Identifique padrões: estresse, sono ruim, café, postura. 
+                        Você entende o que piora seus sintomas.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Histórico e insights</h3>
+                    <p>
+                        Veja sua evolução ao longo das semanas e receba insights 
+                        sobre seus padrões de sintomas.
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📚</div>
+                    <h3>Conteúdo educativo</h3>
+                    <p>
+                        Aprenda sobre DTM, ATM, bruxismo, hábitos parafuncionais 
+                        e quando procurar ajuda profissional.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- SOS DESTAQUE -->
+            <div class="sos-highlight">
+                <div class="sos-icon-large">⚡</div>
+                <h2>Botão SOS ATM</h2>
+                <p class="lead">
+                    A função que pode fazer toda diferença: quando sua mandíbula travar, 
+                    quando acordar com dor, quando sentir o rosto muito tenso.
+                </p>
+                <p class="lead">
+                    O app faz uma triagem segura e te guia por um protocolo acolhedor e prático 
+                    — ou orienta quando você deve buscar atendimento profissional.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- AUTORIDADE / DRA. VANESSA -->
+    <section class="authority-section">
+        <div class="container">
+            <div class="authority-content">
+                <div class="doctor-photo">
+                    <div class="photo-placeholder">
+                        Foto da<br>Dra. Vanessa<br>Zaidan Silveira
+                    </div>
+                </div>
+                
+                <div class="authority-text">
+                    <h3>Dra. Vanessa Zaidan Silveira</h3>
+                    <p class="doctor-title">
+                        Cirurgiã Bucomaxilofacial • Especialista em DTM, Dor Orofacial e Bruxismo
+                    </p>
+                    <p>
+                        Criadora do Método Rearticular™, a Dra. Vanessa dedica sua carreira 
+                        ao diagnóstico e tratamento de disfunções temporomandibulares e 
+                        dor orofacial.
+                    </p>
+                    <p>
+                        Todos os protocolos do ATM Leve foram desenvolvidos com sua curadoria 
+                        clínica, combinando evidência científica, escuta profunda e cuidado 
+                        humanizado.
+                    </p>
+                    <a href="http://zaidansilveira.com.br" target="_blank" class="btn btn-secondary">
+                        Conhecer a Dra. Vanessa →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PREÇO -->
+    <section class="pricing-section" id="preco">
+        <div class="container-narrow text-center">
+            <h2>Comece hoje</h2>
+            <p class="lead">
+                Menos que uma ida à farmácia. Mais direção para o seu dia a dia.
+            </p>
+            
+            <div class="pricing-card">
+                <span class="pricing-badge">Oferta de lançamento</span>
+                <h3>ATM Leve — Plano Mensal</h3>
+                
+                <div class="price-display">
+                    <div class="price-amount">R$ 24,90</div>
+                    <div class="price-period">por mês</div>
+                </div>
+                
+                <ul class="benefits-list">
+                    <li>Check-in diário ilimitado</li>
+                    <li>Todos os protocolos guiados</li>
+                    <li>Botão SOS ATM</li>
+                    <li>Rastreador de gatilhos</li>
+                    <li>Histórico completo e insights</li>
+                    <li>Recomendações personalizadas</li>
+                    <li>Conteúdo educativo atualizado</li>
+                    <li>Suporte por e-mail</li>
+                    <li>Cancele quando quiser</li>
+                </ul>
+                
+                <a href="#" class="btn btn-primary btn-large" style="width: 100%;">
+                    Assinar agora
+                </a>
+                
+                <div class="guarantee-box">
+                    <strong>Garantia de 7 dias:</strong> Se você não sentir que o ATM Leve 
+                    está te ajudando, devolvemos seu dinheiro. Sem perguntas.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq-section">
+        <div class="container-narrow text-center">
+            <h2>Perguntas frequentes</h2>
+        </div>
+        
+        <div class="container-narrow">
+            <div class="faq-list">
+                <details class="faq-item">
+                    <summary>O ATM Leve substitui consulta com especialista?</summary>
+                    <div class="faq-content">
+                        <p>
+                            Não. O ATM Leve é uma ferramenta de educação, autocuidado e 
+                            acompanhamento de sintomas. Ele não substitui consulta, diagnóstico 
+                            ou tratamento com profissional de saúde.
+                        </p>
+                        <p>
+                            O app foi criado para ser um suporte diário entre consultas.
+                        </p>
+                    </div>
+                </details>
+                
+                <details class="faq-item">
+                    <summary>Para quem é o ATM Leve?</summary>
+                    <div class="faq-content">
+                        <p>
+                            Para pessoas que convivem com tensão facial, bruxismo, apertamento, 
+                            dor mandibular, estalos, sensação de travamento ou outros sinais 
+                            de DTM.
+                        </p>
+                    </div>
+                </details>
+                
+                <details class="faq-item">
+                    <summary>Como funciona o Botão SOS?</summary>
+                    <div class="faq-content">
+                        <p>
+                            O app faz uma triagem de segurança e depois:
+                        </p>
+                        <ul>
+                            <li>Se houver sinais de alerta, orienta você a procurar atendimento profissional</li>
+                            <li>Se for seguro, libera um protocolo acolhedor e guiado</li>
+                        </ul>
+                    </div>
+                </details>
+                
+                <details class="faq-item">
+                    <summary>Posso cancelar a qualquer momento?</summary>
+                    <div class="faq-content">
+                        <p>
+                            Sim. Você pode cancelar sua assinatura a qualquer momento. 
+                            Não há multa, não há fidelidade.
+                        </p>
+                    </div>
+                </details>
+                
+                <details class="faq-item">
+                    <summary>O app funciona no meu celular?</summary>
+                    <div class="faq-content">
+                        <p>
+                            Sim. O ATM Leve funciona em qualquer smartphone moderno (iPhone ou Android) 
+                            pelo navegador. Você pode instalar o ícone na sua tela inicial.
+                        </p>
+                    </div>
+                </details>
+                
+                <details class="faq-item">
+                    <summary>Tem garantia?</summary>
+                    <div class="faq-content">
+                        <p>
+                            Sim. Você tem 7 dias para testar. Se não sentir que está te ajudando, 
+                            devolvemos 100% do valor pago.
+                        </p>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA FINAL -->
+    <section class="final-cta">
+        <div class="container text-center">
+            <h2>Você não precisa continuar improvisando</h2>
+            <p class="lead">
+                Comece hoje a cuidar melhor da sua ATM, entender seus gatilhos 
+                e ter orientações seguras para o dia a dia.
+            </p>
+            
+            <a href="#preco" class="btn btn-primary btn-large" style="margin-top: var(--space-xl);">
+                Assinar o ATM Leve — R$ 24,90/mês
+            </a>
+            
+            <p class="price-tag">
+                Cancele quando quiser • Garantia de 7 dias
+            </p>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">ATM Leve</div>
+                
+                <ul class="footer-links">
+                    <li><a href="#problema">Sobre</a></li>
+                    <li><a href="#solucao">Como funciona</a></li>
+                    <li><a href="#preco">Preços</a></li>
+                    <li><a href="http://zaidansilveira.com.br" target="_blank">Dra. Vanessa</a></li>
+                    <li><a href="#">Contato</a></li>
+                    <li><a href="#">Termos de uso</a></li>
+                    <li><a href="#">Privacidade</a></li>
+                </ul>
+                
+                <div class="footer-disclaimer">
+                    <p>
+                        <strong>Importante:</strong> O ATM Leve é uma ferramenta de educação, 
+                        autocuidado e acompanhamento de sintomas. Não substitui consulta, 
+                        diagnóstico ou tratamento com profissional de saúde.
+                    </p>
+                </div>
+                
+                <div class="footer-copyright">
+                    <p>&copy; 2025 ATM Leve. Todos os direitos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html
