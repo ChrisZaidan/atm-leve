@@ -1,0 +1,2816 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<title>ATM Leve</title>
+<style>
+  /* =========================================
+     DESIGN TOKENS
+  ========================================= */
+  :root {
+    --off-white:   #F7F5F2;
+    --dark:        #4a4a4a;
+    --burnt:       #C4622D;
+    --burnt-light: #D97B4F;
+    --blue-grey:   #A8B8C8;
+    --blue-grey-light: #D6E2EC;
+    --blue-grey-dark:  #7A96A8;
+    --surface:     #FFFFFF;
+    --border:      #E8E4DF;
+    --text-muted:  #8A8A8A;
+    --success:     #6BAF92;
+    --font: 'Georgia', 'Times New Roman', serif;
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --shadow: 0 2px 20px rgba(74,74,74,0.08);
+    --shadow-md: 0 4px 32px rgba(74,74,74,0.12);
+  }
+
+  /* =========================================
+     RESET & BASE
+  ========================================= */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--off-white);
+    color: var(--dark);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  img { display: block; max-width: 100%; }
+  button { cursor: pointer; border: none; background: none; font-family: inherit; }
+  input, textarea, select { font-family: inherit; }
+
+  /* =========================================
+     APP SHELL
+  ========================================= */
+  #app {
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: var(--off-white);
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* =========================================
+     SCREENS
+  ========================================= */
+  .screen {
+    display: none;
+    min-height: 100vh;
+    flex-direction: column;
+    animation: fadeIn 0.35s ease;
+  }
+  .screen.active { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* =========================================
+     SPLASH / ONBOARDING
+  ========================================= */
+  #screen-splash {
+    background: var(--dark);
+    align-items: center;
+    justify-content: center;
+    padding: 48px 32px;
+    text-align: center;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .logo-wrap {
+    margin-bottom: 32px;
+  }
+
+  .logo-svg {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 16px;
+  }
+
+  .logo-name {
+    font-family: var(--font);
+    font-size: 2rem;
+    font-weight: 400;
+    color: var(--off-white);
+    letter-spacing: 0.04em;
+  }
+
+  .logo-name span {
+    color: var(--burnt-light);
+  }
+
+  .logo-tagline {
+    font-size: 0.8rem;
+    color: var(--blue-grey);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .splash-headline {
+    font-family: var(--font);
+    font-size: 1.6rem;
+    color: var(--off-white);
+    line-height: 1.35;
+    margin-bottom: 16px;
+    font-weight: 400;
+  }
+
+  .splash-sub {
+    font-size: 0.95rem;
+    color: var(--blue-grey);
+    line-height: 1.65;
+    margin-bottom: 48px;
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 16px 24px;
+    background: var(--burnt);
+    color: #fff;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-primary:hover  { background: var(--burnt-light); }
+  .btn-primary:active { transform: scale(0.98); }
+
+  .btn-ghost {
+    width: 100%;
+    padding: 14px 24px;
+    background: transparent;
+    color: var(--blue-grey);
+    border: 1.5px solid rgba(168,184,200,0.4);
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    margin-top: 12px;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--blue-grey); color: var(--off-white); }
+
+  /* =========================================
+     ONBOARDING STEPS
+  ========================================= */
+  #screen-onboarding {
+    background: var(--off-white);
+    padding: 0;
+  }
+
+  .onb-progress {
+    display: flex;
+    gap: 6px;
+    padding: 24px 24px 0;
+  }
+  .onb-dot {
+    flex: 1;
+    height: 3px;
+    border-radius: 99px;
+    background: var(--border);
+    transition: background 0.3s;
+  }
+  .onb-dot.done { background: var(--burnt); }
+
+  .onb-step {
+    display: none;
+    flex-direction: column;
+    flex: 1;
+    padding: 32px 24px 40px;
+    animation: fadeIn 0.3s ease;
+  }
+  .onb-step.active { display: flex; }
+
+  .onb-icon {
+    font-size: 3rem;
+    margin-bottom: 24px;
+    display: block;
+  }
+
+  .onb-title {
+    font-family: var(--font);
+    font-size: 1.55rem;
+    color: var(--dark);
+    line-height: 1.3;
+    margin-bottom: 12px;
+    font-weight: 400;
+  }
+
+  .onb-desc {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+
+  .onb-choice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+
+  .onb-choice {
+    padding: 14px 18px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    font-size: 0.9rem;
+    color: var(--dark);
+    text-align: left;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .onb-choice.selected {
+    border-color: var(--burnt);
+    background: #FDF1EB;
+    color: var(--burnt);
+    font-weight: 600;
+  }
+
+  .onb-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    font-size: 1rem;
+    color: var(--dark);
+    outline: none;
+    margin-bottom: 32px;
+    transition: border-color 0.2s;
+  }
+  .onb-input:focus { border-color: var(--burnt); }
+
+  .onb-nav {
+    display: flex;
+    gap: 12px;
+    margin-top: auto;
+  }
+
+  .btn-back {
+    padding: 14px 20px;
+    background: transparent;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    transition: border-color 0.2s;
+  }
+  .btn-back:hover { border-color: var(--dark); }
+
+  /* =========================================
+     HEADER
+  ========================================= */
+  .app-header {
+    padding: 20px 24px 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .header-logo-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .header-logo-text {
+    font-family: var(--font);
+    font-size: 1.2rem;
+    color: var(--dark);
+    letter-spacing: 0.02em;
+  }
+  .header-logo-text span { color: var(--burnt); }
+
+  .header-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--off-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: background 0.2s;
+  }
+  .icon-btn:hover { background: var(--border); }
+
+  /* =========================================
+     BOTTOM NAV
+  ========================================= */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    z-index: 200;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 4px 12px;
+    gap: 4px;
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .nav-item.active { color: var(--burnt); }
+
+  .nav-item svg {
+    width: 22px;
+    height: 22px;
+    stroke: currentColor;
+    fill: none;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* =========================================
+     PAGE CONTENT WRAPPER
+  ========================================= */
+  .page-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 20px 120px;
+  }
+
+  /* =========================================
+     HOME SCREEN
+  ========================================= */
+  .greeting-block {
+    margin-bottom: 24px;
+  }
+
+  .greeting-time {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--blue-grey-dark);
+    margin-bottom: 4px;
+  }
+
+  .greeting-name {
+    font-family: var(--font);
+    font-size: 1.6rem;
+    color: var(--dark);
+    font-weight: 400;
+    line-height: 1.25;
+  }
+
+  /* SOS Button */
+  .sos-banner {
+    background: linear-gradient(135deg, var(--burnt) 0%, #A84A1F 100%);
+    border-radius: var(--radius);
+    padding: 20px 20px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 4px 20px rgba(196,98,45,0.3);
+  }
+  .sos-banner:active { transform: scale(0.98); }
+
+  .sos-left h3 {
+    font-family: var(--font);
+    font-size: 1.1rem;
+    font-weight: 400;
+    margin-bottom: 4px;
+  }
+  .sos-left p { font-size: 0.8rem; opacity: 0.85; line-height: 1.4; }
+
+  .sos-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  /* Check-in Card */
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+
+  .card-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--blue-grey-dark);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .card-title {
+    font-family: var(--font);
+    font-size: 1.1rem;
+    color: var(--dark);
+    font-weight: 400;
+    margin-bottom: 8px;
+  }
+
+  .card-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .btn-card {
+    padding: 12px 20px;
+    background: var(--burnt);
+    color: #fff;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    font-weight: 600;
+    width: 100%;
+    transition: background 0.2s;
+  }
+  .btn-card:hover { background: var(--burnt-light); }
+
+  .btn-card-outline {
+    padding: 12px 20px;
+    background: transparent;
+    color: var(--burnt);
+    border: 1.5px solid var(--burnt);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    font-weight: 600;
+    width: 100%;
+    transition: background 0.2s;
+  }
+  .btn-card-outline:hover { background: #FDF1EB; }
+
+  /* Section Titles */
+  .section-title {
+    font-family: var(--font);
+    font-size: 1.15rem;
+    color: var(--dark);
+    font-weight: 400;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .section-link {
+    font-size: 0.8rem;
+    color: var(--burnt);
+    text-decoration: none;
+    font-family: var(--font-sans);
+    font-weight: 500;
+  }
+
+  /* Protocol Scroll Cards */
+  .scroll-row {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 24px;
+    scrollbar-width: none;
+  }
+  .scroll-row::-webkit-scrollbar { display: none; }
+
+  .proto-card {
+    min-width: 150px;
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 18px 16px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+    flex-shrink: 0;
+  }
+  .proto-card:hover { border-color: var(--blue-grey); }
+  .proto-card:active { transform: scale(0.97); }
+
+  .proto-card-icon { font-size: 1.6rem; margin-bottom: 10px; }
+  .proto-card-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+  .proto-card-time {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  /* Quote */
+  .quote-block {
+    background: var(--blue-grey-light);
+    border-radius: var(--radius);
+    padding: 20px;
+    border-left: 3px solid var(--blue-grey-dark);
+    margin-bottom: 20px;
+  }
+  .quote-text {
+    font-family: var(--font);
+    font-size: 1rem;
+    color: var(--dark);
+    line-height: 1.6;
+    font-style: italic;
+    margin-bottom: 8px;
+  }
+  .quote-author {
+    font-size: 0.75rem;
+    color: var(--blue-grey-dark);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  /* Streak */
+  .streak-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .streak-day {
+    flex: 1;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .streak-day.done {
+    background: var(--burnt);
+    color: #fff;
+  }
+  .streak-day.today {
+    background: var(--blue-grey-light);
+    border: 2px solid var(--blue-grey-dark);
+    color: var(--dark);
+  }
+
+  /* =========================================
+     CHECK-IN SCREEN
+  ========================================= */
+  .checkin-header {
+    background: linear-gradient(135deg, var(--dark) 0%, #3a3a3a 100%);
+    padding: 40px 24px 32px;
+    color: var(--off-white);
+  }
+
+  .checkin-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--blue-grey);
+    margin-bottom: 8px;
+  }
+
+  .checkin-title {
+    font-family: var(--font);
+    font-size: 1.55rem;
+    font-weight: 400;
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+
+  .checkin-sub {
+    font-size: 0.85rem;
+    color: var(--blue-grey);
+    line-height: 1.6;
+  }
+
+  .checkin-body { padding: 24px 20px 120px; }
+
+  .question-block { margin-bottom: 28px; }
+
+  .question-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+
+  .scale-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .scale-btn {
+    flex: 1;
+    padding: 10px 4px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: all 0.2s;
+  }
+  .scale-btn.selected {
+    border-color: var(--burnt);
+    background: var(--burnt);
+    color: #fff;
+  }
+
+  .scale-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+  }
+  .scale-labels span {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+  }
+
+  .toggle-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .toggle-chip {
+    padding: 8px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 99px;
+    background: var(--surface);
+    font-size: 0.82rem;
+    color: var(--dark);
+    transition: all 0.2s;
+  }
+  .toggle-chip.selected {
+    border-color: var(--burnt);
+    background: #FDF1EB;
+    color: var(--burnt);
+    font-weight: 600;
+  }
+
+  .textarea-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    font-size: 0.9rem;
+    color: var(--dark);
+    resize: none;
+    outline: none;
+    min-height: 80px;
+    line-height: 1.6;
+    transition: border-color 0.2s;
+  }
+  .textarea-input:focus { border-color: var(--burnt); }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 24px 0;
+  }
+
+  /* =========================================
+     SOS SCREEN
+  ========================================= */
+  .sos-header {
+    background: linear-gradient(160deg, var(--burnt) 0%, #8B3A1A 100%);
+    padding: 48px 24px 40px;
+    text-align: center;
+    color: #fff;
+  }
+
+  .sos-pulse {
+    width: 72px;
+    height: 72px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(255,255,255,0.3); }
+    70%  { box-shadow: 0 0 0 18px rgba(255,255,255,0); }
+    100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+  }
+
+  .sos-header h2 {
+    font-family: var(--font);
+    font-size: 1.6rem;
+    font-weight: 400;
+    margin-bottom: 8px;
+  }
+
+  .sos-header p {
+    font-size: 0.9rem;
+    opacity: 0.85;
+    line-height: 1.6;
+  }
+
+  .sos-body { padding: 24px 20px 120px; }
+
+  .sos-situation-title {
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  .sos-situations {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .sos-sit-btn {
+    padding: 16px 18px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    text-align: left;
+    font-size: 0.9rem;
+    color: var(--dark);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .sos-sit-btn:hover { border-color: var(--burnt); background: #FDF1EB; }
+  .sos-sit-btn .sit-icon { font-size: 1.3rem; }
+
+  /* Protocol Steps */
+  .protocol-box {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+
+  .protocol-box-title {
+    font-family: var(--font);
+    font-size: 1.1rem;
+    color: var(--dark);
+    font-weight: 400;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .step-list { display: flex; flex-direction: column; gap: 16px; }
+
+  .step-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--burnt);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .step-text {
+    font-size: 0.9rem;
+    color: var(--dark);
+    line-height: 1.65;
+  }
+  .step-text strong { color: var(--burnt); }
+
+  .disclaimer-box {
+    background: var(--blue-grey-light);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    font-size: 0.78rem;
+    color: var(--blue-grey-dark);
+    line-height: 1.6;
+    margin-top: 20px;
+    border: 1px solid rgba(168,184,200,0.3);
+  }
+
+  /* =========================================
+     PROTOCOLS SCREEN
+  ========================================= */
+  .proto-header {
+    padding: 32px 24px 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .proto-header-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--blue-grey-dark);
+    margin-bottom: 6px;
+  }
+
+  .proto-header-title {
+    font-family: var(--font);
+    font-size: 1.5rem;
+    color: var(--dark);
+    font-weight: 400;
+    margin-bottom: 6px;
+  }
+
+  .proto-header-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .proto-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 24px 20px 120px;
+  }
+
+  .proto-item {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+  }
+  .proto-item:hover { border-color: var(--blue-grey); }
+  .proto-item:active { transform: scale(0.98); }
+
+  .proto-item-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--blue-grey-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+
+  .proto-item-info { flex: 1; }
+
+  .proto-item-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 3px;
+  }
+
+  .proto-item-desc {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  .proto-item-meta {
+    font-size: 0.75rem;
+    color: var(--blue-grey-dark);
+    font-weight: 500;
+  }
+
+  /* Protocol Detail */
+  .proto-detail-header {
+    background: var(--dark);
+    padding: 40px 24px 32px;
+    color: var(--off-white);
+  }
+
+  .btn-back-inline {
+    font-size: 0.85rem;
+    color: var(--blue-grey);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .proto-detail-icon { font-size: 2.5rem; margin-bottom: 12px; display: block; }
+  .proto-detail-title {
+    font-family: var(--font);
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin-bottom: 6px;
+  }
+  .proto-detail-meta { font-size: 0.8rem; color: var(--blue-grey); }
+
+  .proto-detail-body { padding: 24px 20px 120px; }
+
+  .proto-benefit {
+    background: var(--blue-grey-light);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    font-size: 0.85rem;
+    color: var(--dark);
+    line-height: 1.6;
+    margin-bottom: 24px;
+    border-left: 3px solid var(--blue-grey-dark);
+  }
+
+  /* =========================================
+     TRACKER SCREEN
+  ========================================= */
+  .tracker-header {
+    background: var(--surface);
+    padding: 32px 24px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tracker-header-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--blue-grey-dark);
+    margin-bottom: 6px;
+  }
+
+  .tracker-header-title {
+    font-family: var(--font);
+    font-size: 1.5rem;
+    color: var(--dark);
+    font-weight: 400;
+    margin-bottom: 6px;
+  }
+
+  .tracker-body { padding: 24px 20px 120px; }
+
+  .insight-card {
+    background: linear-gradient(135deg, var(--dark) 0%, #3a3a3a 100%);
+    border-radius: var(--radius);
+    padding: 20px;
+    color: var(--off-white);
+    margin-bottom: 20px;
+  }
+
+  .insight-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--blue-grey);
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .insight-text {
+    font-family: var(--font);
+    font-size: 1rem;
+    line-height: 1.6;
+    font-style: italic;
+    color: var(--off-white);
+  }
+
+  /* Chart */
+  .chart-wrap {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px;
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+
+  .chart-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 80px;
+    margin-bottom: 8px;
+  }
+
+  .bar-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+    justify-content: flex-end;
+  }
+
+  .bar-fill {
+    width: 100%;
+    border-radius: 4px 4px 0 0;
+    background: var(--blue-grey-light);
+    transition: height 0.4s ease;
+  }
+  .bar-fill.high { background: var(--burnt); }
+  .bar-fill.mid  { background: var(--blue-grey); }
+
+  .bar-day {
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* Trigger grid */
+  .trigger-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .trigger-item {
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .trigger-item-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .trigger-name {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--dark);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .trigger-pct {
+    font-size: 0.75rem;
+    color: var(--burnt);
+    font-weight: 700;
+  }
+
+  .trigger-bar {
+    height: 4px;
+    border-radius: 99px;
+    background: var(--border);
+    overflow: hidden;
+  }
+
+  .trigger-bar-fill {
+    height: 100%;
+    background: var(--burnt);
+    border-radius: 99px;
+  }
+
+  /* =========================================
+     PROFILE / EDUCAÇÃO SCREEN
+  ========================================= */
+  .profile-header {
+    background: var(--dark);
+    padding: 40px 24px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    color: var(--off-white);
+  }
+
+  .doctor-avatar {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: top center;
+    border: 3px solid var(--burnt);
+    margin-bottom: 14px;
+  }
+
+  .doctor-name {
+    font-family: var(--font);
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: var(--off-white);
+    margin-bottom: 2px;
+  }
+
+  .doctor-title {
+    font-size: 0.78rem;
+    color: var(--blue-grey);
+    line-height: 1.5;
+    max-width: 260px;
+  }
+
+  .profile-body { padding: 24px 20px 120px; }
+
+  .edu-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    border: 1px solid var(--border);
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .edu-card:hover { border-color: var(--blue-grey); }
+
+  .edu-card-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  .edu-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--blue-grey-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .edu-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--dark);
+    line-height: 1.3;
+  }
+
+  .edu-desc {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* Assinatura */
+  .plan-card {
+    background: linear-gradient(135deg, var(--burnt) 0%, #A84A1F 100%);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    color: #fff;
+    margin-bottom: 16px;
+    text-align: center;
+    box-shadow: 0 4px 24px rgba(196,98,45,0.3);
+  }
+
+  .plan-badge {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    background: rgba(255,255,255,0.2);
+    border-radius: 99px;
+    padding: 4px 12px;
+    display: inline-block;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  .plan-price {
+    font-family: var(--font);
+    font-size: 2.8rem;
+    font-weight: 400;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .plan-price sup {
+    font-size: 1.2rem;
+    vertical-align: super;
+  }
+
+  .plan-period {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    margin-bottom: 20px;
+  }
+
+  .plan-features {
+    list-style: none;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+
+  .plan-features li {
+    font-size: 0.85rem;
+    padding: 6px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0.9;
+  }
+
+  .plan-features li::before {
+    content: '✓';
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .btn-white {
+    width: 100%;
+    padding: 14px;
+    background: #fff;
+    color: var(--burnt);
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+    font-weight: 700;
+    transition: background 0.2s;
+  }
+  .btn-white:hover { background: var(--off-white); }
+
+  /* =========================================
+     MODAL
+  ========================================= */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(74,74,74,0.5);
+    z-index: 999;
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal-sheet {
+    background: var(--off-white);
+    width: 100%;
+    max-width: 430px;
+    border-radius: 24px 24px 0 0;
+    padding: 8px 0 0;
+    max-height: 92vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+
+  .modal-handle {
+    width: 40px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 99px;
+    margin: 0 auto 20px;
+  }
+
+  .modal-inner { padding: 0 20px 40px; }
+
+  .modal-close {
+    float: right;
+    font-size: 1.4rem;
+    color: var(--text-muted);
+    line-height: 1;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 4px;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--dark);
+    color: var(--off-white);
+    padding: 12px 20px;
+    border-radius: 99px;
+    font-size: 0.85rem;
+    z-index: 9999;
+    opacity: 0;
+    transition: all 0.3s;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* =========================================
+     MISC UTILITIES
+  ========================================= */
+  .mt-4  { margin-top: 4px; }
+  .mt-8  { margin-top: 8px; }
+  .mt-16 { margin-top: 16px; }
+  .mt-24 { margin-top: 24px; }
+  .mb-8  { margin-bottom: 8px; }
+  .mb-16 { margin-bottom: 16px; }
+  .mb-24 { margin-bottom: 24px; }
+  .text-center { text-align: center; }
+  .flex-between { display: flex; align-items: center; justify-content: space-between; }
+
+  .tag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 99px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .tag-blue { background: var(--blue-grey-light); color: var(--blue-grey-dark); }
+  .tag-burnt { background: #FDF1EB; color: var(--burnt); }
+  .tag-green { background: #E8F5EE; color: #4A9068; }
+
+  /* =========================================
+     RESPONSIVE
+  ========================================= */
+  @media (min-width: 431px) {
+    body {
+      background: #DDDAD6;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 0;
+    }
+    #app {
+      min-height: 100vh;
+      box-shadow: 0 0 60px rgba(0,0,0,0.15);
+    }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ======================================
+       SPLASH SCREEN
+  ======================================= -->
+  <div class="screen active" id="screen-splash">
+    <div class="logo-wrap">
+      <!-- Logo SVG criado especialmente para ATM Leve -->
+      <svg class="logo-svg" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="40" cy="40" r="38" stroke="#C4622D" stroke-width="1.5" fill="none" opacity="0.4"/>
+        <circle cx="40" cy="40" r="30" stroke="#A8B8C8" stroke-width="1" fill="none" opacity="0.5"/>
+        <!-- Mandíbula estilizada -->
+        <path d="M24 30 Q24 22 40 22 Q56 22 56 30" stroke="#F7F5F2" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <path d="M24 30 L22 52 Q22 58 28 58 L52 58 Q58 58 58 52 L56 30" stroke="#F7F5F2" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Dentes simbólicos -->
+        <path d="M32 58 L32 50 Q32 47 35 47 L37 47 Q40 47 40 50 L40 58" stroke="#C4622D" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M40 58 L40 50 Q40 47 43 47 L45 47 Q48 47 48 50 L48 58" stroke="#C4622D" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <!-- Ondas de relaxamento -->
+        <path d="M30 36 Q34 33 38 36 Q42 39 46 36 Q50 33 54 36" stroke="#A8B8C8" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.7"/>
+      </svg>
+      <div class="logo-name">ATM <span>Leve</span></div>
+      <div class="logo-tagline">Suporte diário para sua mandíbula</div>
+    </div>
+
+    <h1 class="splash-headline">Cuide da sua mandíbula.<br/>Um dia de cada vez.</h1>
+    <p class="splash-sub">Rotinas guiadas de poucos minutos para você entender seus gatilhos, aliviar a tensão facial e viver com mais conforto — todos os dias.</p>
+
+    <button class="btn-primary" onclick="goTo('screen-onboarding')">Começar agora</button>
+    <button class="btn-ghost" onclick="goToHome()">Já tenho conta</button>
+  </div>
+
+  <!-- ======================================
+       ONBOARDING
+  ======================================= -->
+  <div class="screen" id="screen-onboarding">
+    <!-- Progress dots -->
+    <div class="onb-progress">
+      <div class="onb-dot done" id="dot-0"></div>
+      <div class="onb-dot" id="dot-1"></div>
+      <div class="onb-dot" id="dot-2"></div>
+      <div class="onb-dot" id="dot-3"></div>
+    </div>
+
+    <!-- Step 0: Nome -->
+    <div class="onb-step active" id="onb-0">
+      <span class="onb-icon">👋</span>
+      <h2 class="onb-title">Olá! Como posso te chamar?</h2>
+      <p class="onb-desc">Quero que essa experiência seja pessoal e acolhedora — como uma conversa entre nós.</p>
+      <input class="onb-input" id="input-name" type="text" placeholder="Seu nome" maxlength="30"/>
+      <div class="onb-nav">
+        <button class="btn-primary" style="flex:1" onclick="onbNext(0)">Continuar →</button>
+      </div>
+    </div>
+
+    <!-- Step 1: Principal sintoma -->
+    <div class="onb-step" id="onb-1">
+      <span class="onb-icon">😮‍💨</span>
+      <h2 class="onb-title">O que você mais sente?</h2>
+      <p class="onb-desc">Selecione tudo o que faz parte da sua rotina. Isso vai me ajudar a personalizar sua experiência.</p>
+      <div class="onb-choice-list" id="symptoms-list">
+        <button class="onb-choice" onclick="toggleChoice(this)">😴 Acordo com a mandíbula cansada</button>
+        <button class="onb-choice" onclick="toggleChoice(this)">🦷 Aperto ou ranjo os dentes</button>
+        <button class="onb-choice" onclick="toggleChoice(this)">🤕 Dores de cabeça frequentes</button>
+        <button class="onb-choice" onclick="toggleChoice(this)">⚡ Sensação de travamento ou estalo</button>
+        <button class="onb-choice" onclick="toggleChoice(this)">😣 Tensão e desconforto facial</button>
+        <button class="onb-choice" onclick="toggleChoice(this)">😰 Estresse e ansiedade</button>
+      </div>
+      <div class="onb-nav">
+        <button class="btn-back" onclick="onbPrev(1)">←</button>
+        <button class="btn-primary" style="flex:1" onclick="onbNext(1)">Continuar →</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Já fez tratamento? -->
+    <div class="onb-step" id="onb-2">
+      <span class="onb-icon">🩺</span>
+      <h2 class="onb-title">Você já buscou tratamento para DTM ou bruxismo?</h2>
+      <p class="onb-desc">Sem julgamentos — só quero entender melhor onde você está hoje.</p>
+      <div class="onb-choice-list" id="treatment-list">
+        <button class="onb-choice" onclick="singleChoice('treatment-list', this)">✅ Sim, uso ou já usei placa</button>
+        <button class="onb-choice" onclick="singleChoice('treatment-list', this)">🔍 Sim, fiz tratamento mas parei</button>
+        <button class="onb-choice" onclick="singleChoice('treatment-list', this)">🌱 Nunca fiz, estou começando a entender</button>
+        <button class="onb-choice" onclick="singleChoice('treatment-list', this)">💬 Estou em acompanhamento atualmente</button>
+      </div>
+      <div class="onb-nav">
+        <button class="btn-back" onclick="onbPrev(2)">←</button>
+        <button class="btn-primary" style="flex:1" onclick="onbNext(2)">Continuar →</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Objetivo -->
+    <div class="onb-step" id="onb-3">
+      <span class="onb-icon">🎯</span>
+      <h2 class="onb-title">O que você espera do ATM Leve?</h2>
+      <p class="onb-desc">Seu objetivo vai guiar as recomendações do seu dia a dia.</p>
+      <div class="onb-choice-list" id="goal-list">
+        <button class="onb-choice" onclick="singleChoice('goal-list', this)">🌅 Criar uma rotina de autocuidado</button>
+        <button class="onb-choice" onclick="singleChoice('goal-list', this)">📊 Entender meus gatilhos</button>
+        <button class="onb-choice" onclick="singleChoice('goal-list', this)">🆘 Ter suporte nos momentos de crise</button>
+        <button class="onb-choice" onclick="singleChoice('goal-list', this)">📚 Aprender mais sobre DTM</button>
+        <button class="onb-choice" onclick="singleChoice('goal-list', this)">🌿 Tudo isso juntos</button>
+      </div>
+      <div class="onb-nav">
+        <button class="btn-back" onclick="onbPrev(3)">←</button>
+        <button class="btn-primary" style="flex:1" onclick="finishOnboarding()">Entrar no app ✨</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================
+       HOME SCREEN
+  ======================================= -->
+  <div class="screen" id="screen-home">
+    <div class="app-header">
+      <div class="header-logo">
+        <svg class="header-logo-icon" viewBox="0 0 32 32" fill="none">
+          <circle cx="16" cy="16" r="15" stroke="#C4622D" stroke-width="1.2" fill="none" opacity="0.5"/>
+          <path d="M9 12 Q9 8 16 8 Q23 8 23 12" stroke="#4a4a4a" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <path d="M9 12 L8 22 Q8 25 11 25 L21 25 Q24 25 24 22 L23 12" stroke="#4a4a4a" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="header-logo-text">ATM <span>Leve</span></span>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" title="Notificações">🔔</button>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <!-- Greeting -->
+      <div class="greeting-block">
+        <div class="greeting-time" id="greeting-time">Bom dia</div>
+        <div class="greeting-name" id="greeting-name">Como está sua mandíbula<br/>hoje?</div>
+      </div>
+
+      <!-- SOS Button -->
+      <div class="sos-banner" onclick="goTo('screen-sos')">
+        <div class="sos-left">
+          <h3>SOS ATM</h3>
+          <p>Sentindo desconforto agora?<br/>Tenho um protocolo para você.</p>
+        </div>
+        <div class="sos-icon">🆘</div>
+      </div>
+
+      <!-- Streak -->
+      <div class="section-title">
+        <span>Sua sequência</span>
+        <span style="font-size:0.85rem; color:var(--burnt);">🔥 4 dias</span>
+      </div>
+      <div class="streak-row">
+        <div class="streak-day done"><span>S</span></div>
+        <div class="streak-day done"><span>T</span></div>
+        <div class="streak-day done"><span>Q</span></div>
+        <div class="streak-day done"><span>Q</span></div>
+        <div class="streak-day today"><span>S</span></div>
+        <div class="streak-day"><span>S</span></div>
+        <div class="streak-day"><span>D</span></div>
+      </div>
+
+      <!-- Check-in Card -->
+      <div class="card">
+        <div class="card-label">Check-in de hoje</div>
+        <div class="card-title">Como você está se sentindo?</div>
+        <div class="card-desc">Leva menos de 2 minutos. Suas respostas ajudam a personalizar as recomendações do dia.</div>
+        <button class="btn-card" onclick="goTo('screen-checkin')">Fazer check-in →</button>
+      </div>
+
+      <!-- Protocolos Rápidos -->
+      <div class="section-title">
+        <span>Protocolos rápidos</span>
+        <a class="section-link" onclick="goTo('screen-protocols')">Ver todos</a>
+      </div>
+      <div class="scroll-row">
+        <div class="proto-card" onclick="openProtocol('relaxamento')">
+          <div class="proto-card-icon">😮‍💨</div>
+          <div class="proto-card-name">Relaxamento Mandibular</div>
+          <div class="proto-card-time">⏱ 3 min</div>
+        </div>
+        <div class="proto-card" onclick="openProtocol('sos-tensao')">
+          <div class="proto-card-icon">🤲</div>
+          <div class="proto-card-name">Pausa Anti-bruxismo</div>
+          <div class="proto-card-time">⏱ 2 min</div>
+        </div>
+        <div class="proto-card" onclick="openProtocol('respiracao')">
+          <div class="proto-card-icon">🌬️</div>
+          <div class="proto-card-name">Respiração Consciente</div>
+          <div class="proto-card-time">⏱ 4 min</div>
+        </div>
+        <div class="proto-card" onclick="openProtocol('noturna')">
+          <div class="proto-card-icon">🌙</div>
+          <div class="proto-card-name">Rotina Noturna</div>
+          <div class="proto-card-time">⏱ 5 min</div>
+        </div>
+      </div>
+
+      <!-- Quote da Dra. Vanessa -->
+      <div class="quote-block">
+        <div class="quote-text">"Cuidar da sua mandíbula não precisa ser complicado. Começa com atenção, consciência e pequenas pausas ao longo do dia."</div>
+        <div class="quote-author">— Dra. Vanessa Zaidan Silveira · Cirurgiã Bucomaxilofacial</div>
+      </div>
+
+      <!-- Insights -->
+      <div class="section-title">Seu progresso</div>
+      <div class="card">
+        <div class="card-label">Insight da semana</div>
+        <div class="card-title" style="font-size:0.95rem; line-height:1.6; margin-bottom:12px;">
+          Nos últimos 4 dias, você registrou menos tensão nas manhãs em que dormiu mais de 7 horas. 💡
+        </div>
+        <button class="btn-card-outline" onclick="goTo('screen-tracker')">Ver rastreador →</button>
+      </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" onclick="navTo('home')">
+        <svg viewBox="0 0 24 24"><path d="M3 9L12 2L21 9V21H15V15H9V21H3V9Z"/></svg>
+        Início
+      </button>
+      <button class="nav-item" onclick="navTo('checkin')">
+        <svg viewBox="0 0 24 24"><path d="M9 11L12 14L22 4"/><path d="M21 12V19A2 2 0 0119 21H5A2 2 0 013 19V5A2 2 0 015 3H16"/></svg>
+        Check-in
+      </button>
+      <button class="nav-item" onclick="navTo('protocols')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8V12L15 15"/></svg>
+        Protocolos
+      </button>
+      <button class="nav-item" onclick="navTo('tracker')">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Rastreador
+      </button>
+      <button class="nav-item" onclick="navTo('edu')">
+        <svg viewBox="0 0 24 24"><path d="M20 21V19A4 4 0 0016 15H8A4 4 0 004 19V21"/><circle cx="12" cy="7" r="4"/></svg>
+        Perfil
+      </button>
+    </nav>
+  </div>
+
+  <!-- ======================================
+       CHECK-IN SCREEN
+  ======================================= -->
+  <div class="screen" id="screen-checkin">
+    <div class="checkin-header">
+      <div class="checkin-label">Check-in diário</div>
+      <div class="checkin-title">Como foi seu dia até agora?</div>
+      <div class="checkin-sub">Suas respostas são confidenciais e ajudam a personalizar o seu cuidado.</div>
+    </div>
+
+    <div class="checkin-body">
+
+      <!-- Dor / Desconforto -->
+      <div class="question-block">
+        <div class="question-label">1. Como está seu nível de tensão ou desconforto facial agora?</div>
+        <div class="scale-row" id="scale-dor">
+          <button class="scale-btn" onclick="selectScale('scale-dor', this, 1)">1</button>
+          <button class="scale-btn" onclick="selectScale('scale-dor', this, 2)">2</button>
+          <button class="scale-btn" onclick="selectScale('scale-dor', this, 3)">3</button>
+          <button class="scale-btn" onclick="selectScale('scale-dor', this, 4)">4</button>
+          <button class="scale-btn" onclick="selectScale('scale-dor', this, 5)">5</button>
+        </div>
+        <div class="scale-labels">
+          <span>Nenhuma</span>
+          <span>Intensa</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Sono -->
+      <div class="question-block">
+        <div class="question-label">2. Como foi seu sono?</div>
+        <div class="scale-row" id="scale-sono">
+          <button class="scale-btn" onclick="selectScale('scale-sono', this, 1)">1</button>
+          <button class="scale-btn" onclick="selectScale('scale-sono', this, 2)">2</button>
+          <button class="scale-btn" onclick="selectScale('scale-sono', this, 3)">3</button>
+          <button class="scale-btn" onclick="selectScale('scale-sono', this, 4)">4</button>
+          <button class="scale-btn" onclick="selectScale('scale-sono', this, 5)">5</button>
+        </div>
+        <div class="scale-labels">
+          <span>Péssimo</span>
+          <span>Ótimo</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Estresse -->
+      <div class="question-block">
+        <div class="question-label">3. Qual o seu nível de estresse hoje?</div>
+        <div class="scale-row" id="scale-estresse">
+          <button class="scale-btn" onclick="selectScale('scale-estresse', this, 1)">1</button>
+          <button class="scale-btn" onclick="selectScale('scale-estresse', this, 2)">2</button>
+          <button class="scale-btn" onclick="selectScale('scale-estresse', this, 3)">3</button>
+          <button class="scale-btn" onclick="selectScale('scale-estresse', this, 4)">4</button>
+          <button class="scale-btn" onclick="selectScale('scale-estresse', this, 5)">5</button>
+        </div>
+        <div class="scale-labels">
+          <span>Tranquilo</span>
+          <span>Muito estressada</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Sintomas -->
+      <div class="question-block">
+        <div class="question-label">4. Quais sintomas você notou hoje? (pode marcar mais de um)</div>
+        <div class="toggle-row">
+          <button class="toggle-chip" onclick="toggleChip(this)">😴 Mandíbula cansada</button>
+          <button class="toggle-chip" onclick="toggleChip(this)">🦷 Apertamento</button>
+          <button class="toggle-chip" onclick="toggleChip(this)">🔊 Estalo</button>
+          <button class="toggle-chip" onclick="toggleChip(this)">🤕 Dor de cabeça</button>
+          <button class="toggle-chip" onclick="toggleChip(this)">😣 Travamento</button>
+          <button class="toggle-chip" onclick="toggleChip(this)">😵 Dor no pescoço</button>
+          <button class="toggle-chip" onclick="toggleChip(this)">😴 Acordei com dor</button>
+          <button class="toggle-chip" onclick="toggleChip(this)">✅ Nenhum hoje</button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Gatilhos -->
+      <div class="question-block">
+        <div class="question-label">5. Algum gatilho presente hoje?</div>
+        <div class="toggle-row">
+          <button class="toggle-chip" onclick="toggleChip(this)">☕ Muito café</button>
+          <button class="toggle-chip" onclick="toggleChip(this)">📱 Muitas telas</button>
+          <button class="toggle-chip" onclick="toggleChip(this)">💼 Trabalho intenso</button>
+          <button class="toggle-chip" onclick="toggleChip(this)">😰 Ansiedade</button>
+          <button class="toggle-chip" onclick="toggleChip(this)">🍷 Álcool</button>
+          <button class="toggle-chip" onclick="toggleChip(this)">🪑 Postura ruim</button>
+          <button class="toggle-chip" onclick="toggleChip(this)">🌸 Ciclo menstrual</button>
+          <button class="toggle-chip" onclick="toggleChip(this)">🍕 Alimento duro</button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Nota -->
+      <div class="question-block">
+        <div class="question-label">6. Algo mais que queira registrar?</div>
+        <textarea class="textarea-input" placeholder="Como você está se sentindo? Algum detalhe que quer lembrar..." rows="3"></textarea>
+      </div>
+
+      <button class="btn-primary" onclick="saveCheckin()">Salvar check-in ✓</button>
+
+      <div class="disclaimer-box mt-16">
+        O ATM Leve é uma ferramenta de autocuidado e acompanhamento. Não substitui consulta ou diagnóstico profissional.
+      </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+      <button class="nav-item" onclick="navTo('home')">
+        <svg viewBox="0 0 24 24"><path d="M3 9L12 2L21 9V21H15V15H9V21H3V9Z"/></svg>
+        Início
+      </button>
+      <button class="nav-item active" onclick="navTo('checkin')">
+        <svg viewBox="0 0 24 24"><path d="M9 11L12 14L22 4"/><path d="M21 12V19A2 2 0 0119 21H5A2 2 0 013 19V5A2 2 0 015 3H16"/></svg>
+        Check-in
+      </button>
+      <button class="nav-item" onclick="navTo('protocols')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8V12L15 15"/></svg>
+        Protocolos
+      </button>
+      <button class="nav-item" onclick="navTo('tracker')">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Rastreador
+      </button>
+      <button class="nav-item" onclick="navTo('edu')">
+        <svg viewBox="0 0 24 24"><path d="M20 21V19A4 4 0 0016 15H8A4 4 0 004 19V21"/><circle cx="12" cy="7" r="4"/></svg>
+        Perfil
+      </button>
+    </nav>
+  </div>
+
+  <!-- ======================================
+       SOS SCREEN
+  ======================================= -->
+  <div class="screen" id="screen-sos">
+    <div class="sos-header">
+      <div class="sos-pulse">🆘</div>
+      <h2>SOS ATM</h2>
+      <p>Estou aqui. Respira fundo.<br/>Me conta o que está acontecendo agora.</p>
+    </div>
+
+    <div class="sos-body">
+      <div id="sos-menu">
+        <div class="sos-situation-title">O que você está sentindo?</div>
+        <div class="sos-situations">
+          <button class="sos-sit-btn" onclick="showSOSProtocol('travamento')">
+            <span class="sit-icon">😬</span>
+            <div>
+              <strong>Minha mandíbula travou</strong><br/>
+              <small style="color:var(--text-muted)">Ou está muito difícil de abrir</small>
+            </div>
+          </button>
+          <button class="sos-sit-btn" onclick="showSOSProtocol('tensao')">
+            <span class="sit-icon">😣</span>
+            <div>
+              <strong>Estou com tensão facial intensa</strong><br/>
+              <small style="color:var(--text-muted)">Rosto, têmporas ou pescoço tensos</small>
+            </div>
+          </button>
+          <button class="sos-sit-btn" onclick="showSOSProtocol('apertamento')">
+            <span class="sit-icon">🦷</span>
+            <div>
+              <strong>Percebi que estou apertando</strong><br/>
+              <small style="color:var(--text-muted)">Bruxismo de vigília agora</small>
+            </div>
+          </button>
+          <button class="sos-sit-btn" onclick="showSOSProtocol('manha')">
+            <span class="sit-icon">🌅</span>
+            <div>
+              <strong>Acordei com dor ou mandíbula travada</strong><br/>
+              <small style="color:var(--text-muted)">Manhã difícil</small>
+            </div>
+          </button>
+          <button class="sos-sit-btn" onclick="showSOSProtocol('ansiedade')">
+            <span class="sit-icon">😰</span>
+            <div>
+              <strong>Estresse ou ansiedade disparando</strong><br/>
+              <small style="color:var(--text-muted)">Sinto tudo tenso</small>
+            </div>
+          </button>
+        </div>
+
+        <div class="disclaimer-box">
+          ⚠️ Se você sentir dor muito intensa, inchaço, febre, dormência, dificuldade para engolir ou respirar — procure atendimento profissional imediatamente. O ATM Leve não substitui avaliação médica ou odontológica.
+        </div>
+      </div>
+
+      <!-- Protocol display -->
+      <div id="sos-protocol" style="display:none">
+        <button class="btn-back-inline" onclick="document.getElementById('sos-menu').style.display='block'; document.getElementById('sos-protocol').style.display='none'">← Voltar</button>
+        <div id="sos-protocol-content"></div>
+      </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+      <button class="nav-item" onclick="navTo('home')">
+        <svg viewBox="0 0 24 24"><path d="M3 9L12 2L21 9V21H15V15H9V21H3V9Z"/></svg>
+        Início
+      </button>
+      <button class="nav-item" onclick="navTo('checkin')">
+        <svg viewBox="0 0 24 24"><path d="M9 11L12 14L22 4"/><path d="M21 12V19A2 2 0 0119 21H5A2 2 0 013 19V5A2 2 0 015 3H16"/></svg>
+        Check-in
+      </button>
+      <button class="nav-item" onclick="navTo('protocols')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8V12L15 15"/></svg>
+        Protocolos
+      </button>
+      <button class="nav-item" onclick="navTo('tracker')">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Rastreador
+      </button>
+      <button class="nav-item" onclick="navTo('edu')">
+        <svg viewBox="0 0 24 24"><path d="M20 21V19A4 4 0 0016 15H8A4 4 0 004 19V21"/><circle cx="12" cy="7" r="4"/></svg>
+        Perfil
+      </button>
+    </nav>
+  </div>
+
+  <!-- ======================================
+       PROTOCOLS SCREEN
+  ======================================= -->
+  <div class="screen" id="screen-protocols">
+    <div class="proto-header">
+      <div class="proto-header-label">Biblioteca de protocolos</div>
+      <div class="proto-header-title">Rotinas guiadas</div>
+      <div class="proto-header-desc">Práticas de poucos minutos para aliviar a tensão, criar consciência corporal e cuidar da sua ATM.</div>
+    </div>
+
+    <div id="protocols-list-view">
+      <div class="proto-list">
+        <div class="proto-item" onclick="openProtocol('relaxamento')">
+          <div class="proto-item-icon">😮‍💨</div>
+          <div class="proto-item-info">
+            <div class="proto-item-name">Relaxamento Mandibular</div>
+            <div class="proto-item-desc">Solte a tensão da mandíbula com respiração e consciência corporal</div>
+          </div>
+          <div class="proto-item-meta">3 min →</div>
+        </div>
+        <div class="proto-item" onclick="openProtocol('sos-tensao')">
+          <div class="proto-item-icon">🤲</div>
+          <div class="proto-item-info">
+            <div class="proto-item-name">Pausa Anti-bruxismo</div>
+            <div class="proto-item-desc">Interrompa o ciclo de apertamento em tempo real</div>
+          </div>
+          <div class="proto-item-meta">2 min →</div>
+        </div>
+        <div class="proto-item" onclick="openProtocol('respiracao')">
+          <div class="proto-item-icon">🌬️</div>
+          <div class="proto-item-info">
+            <div class="proto-item-name">Respiração Consciente</div>
+            <div class="proto-item-desc">Ative o sistema de relaxamento do corpo pelo ritmo da respiração</div>
+          </div>
+          <div class="proto-item-meta">4 min →</div>
+        </div>
+        <div class="proto-item" onclick="openProtocol('automassagem')">
+          <div class="proto-item-icon">🙌</div>
+          <div class="proto-item-info">
+            <div class="proto-item-name">Automassagem Segura</div>
+            <div class="proto-item-desc">Pontos de alívio para a musculatura facial e mandibular</div>
+          </div>
+          <div class="proto-item-meta">5 min →</div>
+        </div>
+        <div class="proto-item" onclick="openProtocol('noturna')">
+          <div class="proto-item-icon">🌙</div>
+          <div class="proto-item-info">
+            <div class="proto-item-name">Rotina Noturna</div>
+            <div class="proto-item-desc">Prepare sua mandíbula para um sono mais tranquilo</div>
+          </div>
+          <div class="proto-item-meta">5 min →</div>
+        </div>
+        <div class="proto-item" onclick="openProtocol('manha')">
+          <div class="proto-item-icon">🌅</div>
+          <div class="proto-item-info">
+            <div class="proto-item-name">Despertar Suave</div>
+            <div class="proto-item-desc">Acorde com a mandíbula relaxada e o dia com mais leveza</div>
+          </div>
+          <div class="proto-item-meta">3 min →</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Protocol Detail View -->
+    <div id="protocol-detail-view" style="display:none; flex-direction:column; flex:1;">
+      <div id="protocol-detail-content"></div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+      <button class="nav-item" onclick="navTo('home')">
+        <svg viewBox="0 0 24 24"><path d="M3 9L12 2L21 9V21H15V15H9V21H3V9Z"/></svg>
+        Início
+      </button>
+      <button class="nav-item" onclick="navTo('checkin')">
+        <svg viewBox="0 0 24 24"><path d="M9 11L12 14L22 4"/><path d="M21 12V19A2 2 0 0119 21H5A2 2 0 013 19V5A2 2 0 015 3H16"/></svg>
+        Check-in
+      </button>
+      <button class="nav-item active" onclick="navTo('protocols')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8V12L15 15"/></svg>
+        Protocolos
+      </button>
+      <button class="nav-item" onclick="navTo('tracker')">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Rastreador
+      </button>
+      <button class="nav-item" onclick="navTo('edu')">
+        <svg viewBox="0 0 24 24"><path d="M20 21V19A4 4 0 0016 15H8A4 4 0 004 19V21"/><circle cx="12" cy="7" r="4"/></svg>
+        Perfil
+      </button>
+    </nav>
+  </div>
+
+  <!-- ======================================
+       TRACKER SCREEN
+  ======================================= -->
+  <div class="screen" id="screen-tracker">
+    <div class="tracker-header">
+      <div class="tracker-header-label">Rastreador de gatilhos</div>
+      <div class="tracker-header-title">Entenda o que te afeta</div>
+    </div>
+
+    <div class="tracker-body">
+      <!-- Insight IA -->
+      <div class="insight-card">
+        <div class="insight-label">💡 Insight da semana</div>
+        <div class="insight-text">"Nos dias em que seu sono foi menor que 6h, você registrou tensão facial 3× mais frequente."</div>
+      </div>
+
+      <!-- Gráfico de tensão -->
+      <div class="chart-wrap">
+        <div class="chart-title">Tensão facial — últimos 7 dias</div>
+        <div class="bar-chart">
+          <div class="bar-col">
+            <div class="bar-fill high" style="height:80%"></div>
+            <div class="bar-day">S</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar-fill mid" style="height:50%"></div>
+            <div class="bar-day">T</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar-fill mid" style="height:60%"></div>
+            <div class="bar-day">Q</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar-fill high" style="height:90%"></div>
+            <div class="bar-day">Q</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar-fill" style="height:30%"></div>
+            <div class="bar-day">S</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar-fill" style="height:20%"></div>
+            <div class="bar-day">S</div>
+          </div>
+          <div class="bar-col">
+            <div class="bar-fill mid" style="height:45%"></div>
+            <div class="bar-day">D</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:8px;">
+          <span style="font-size:0.7rem;color:var(--text-muted);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:var(--burnt);border-radius:2px;display:inline-block"></span>Alta</span>
+          <span style="font-size:0.7rem;color:var(--text-muted);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:var(--blue-grey);border-radius:2px;display:inline-block"></span>Moderada</span>
+          <span style="font-size:0.7rem;color:var(--text-muted);display:flex;align-items:center;gap:4px;"><span style="width:10px;height:10px;background:var(--border);border-radius:2px;display:inline-block"></span>Baixa</span>
+        </div>
+      </div>
+
+      <!-- Principais gatilhos -->
+      <div class="section-title">Seus principais gatilhos</div>
+      <div class="trigger-grid">
+        <div class="trigger-item">
+          <div class="trigger-item-top">
+            <div class="trigger-name">😰 Estresse</div>
+            <div class="trigger-pct">86%</div>
+          </div>
+          <div class="trigger-bar"><div class="trigger-bar-fill" style="width:86%"></div></div>
+        </div>
+        <div class="trigger-item">
+          <div class="trigger-item-top">
+            <div class="trigger-name">😴 Sono ruim</div>
+            <div class="trigger-pct">71%</div>
+          </div>
+          <div class="trigger-bar"><div class="trigger-bar-fill" style="width:71%"></div></div>
+        </div>
+        <div class="trigger-item">
+          <div class="trigger-item-top">
+            <div class="trigger-name">📱 Telas</div>
+            <div class="trigger-pct">57%</div>
+          </div>
+          <div class="trigger-bar"><div class="trigger-bar-fill" style="width:57%"></div></div>
+        </div>
+        <div class="trigger-item">
+          <div class="trigger-item-top">
+            <div class="trigger-name">☕ Café</div>
+            <div class="trigger-pct">43%</div>
+          </div>
+          <div class="trigger-bar"><div class="trigger-bar-fill" style="width:43%"></div></div>
+        </div>
+        <div class="trigger-item">
+          <div class="trigger-item-top">
+            <div class="trigger-name">💼 Trabalho</div>
+            <div class="trigger-pct">71%</div>
+          </div>
+          <div class="trigger-bar"><div class="trigger-bar-fill" style="width:71%"></div></div>
+        </div>
+        <div class="trigger-item">
+          <div class="trigger-item-top">
+            <div class="trigger-name">🌸 Ciclo</div>
+            <div class="trigger-pct">29%</div>
+          </div>
+          <div class="trigger-bar"><div class="trigger-bar-fill" style="width:29%"></div></div>
+        </div>
+      </div>
+
+      <!-- Histórico -->
+      <div class="section-title">Histórico recente</div>
+      <div class="card">
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div class="flex-between">
+            <div>
+              <div style="font-size:0.8rem;font-weight:600;color:var(--dark);">Hoje</div>
+              <div style="font-size:0.78rem;color:var(--text-muted);">Tensão 3/5 · Sono 4/5 · Estresse 2/5</div>
+            </div>
+            <span class="tag tag-green">Bom</span>
+          </div>
+          <div class="divider" style="margin:0"></div>
+          <div class="flex-between">
+            <div>
+              <div style="font-size:0.8rem;font-weight:600;color:var(--dark);">Ontem</div>
+              <div style="font-size:0.78rem;color:var(--text-muted);">Tensão 5/5 · Sono 2/5 · Estresse 5/5</div>
+            </div>
+            <span class="tag tag-burnt">Difícil</span>
+          </div>
+          <div class="divider" style="margin:0"></div>
+          <div class="flex-between">
+            <div>
+              <div style="font-size:0.8rem;font-weight:600;color:var(--dark);">Ant. de ontem</div>
+              <div style="font-size:0.78rem;color:var(--text-muted);">Tensão 2/5 · Sono 5/5 · Estresse 2/5</div>
+            </div>
+            <span class="tag tag-green">Ótimo</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+      <button class="nav-item" onclick="navTo('home')">
+        <svg viewBox="0 0 24 24"><path d="M3 9L12 2L21 9V21H15V15H9V21H3V9Z"/></svg>
+        Início
+      </button>
+      <button class="nav-item" onclick="navTo('checkin')">
+        <svg viewBox="0 0 24 24"><path d="M9 11L12 14L22 4"/><path d="M21 12V19A2 2 0 0119 21H5A2 2 0 013 19V5A2 2 0 015 3H16"/></svg>
+        Check-in
+      </button>
+      <button class="nav-item" onclick="navTo('protocols')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8V12L15 15"/></svg>
+        Protocolos
+      </button>
+      <button class="nav-item active" onclick="navTo('tracker')">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Rastreador
+      </button>
+      <button class="nav-item" onclick="navTo('edu')">
+        <svg viewBox="0 0 24 24"><path d="M20 21V19A4 4 0 0016 15H8A4 4 0 004 19V21"/><circle cx="12" cy="7" r="4"/></svg>
+        Perfil
+      </button>
+    </nav>
+  </div>
+
+  <!-- ======================================
+       EDU / PERFIL SCREEN
+  ======================================= -->
+  <div class="screen" id="screen-edu">
+    <div class="profile-header">
+      <!-- Foto da Dra. Vanessa -->
+      <img class="doctor-avatar" id="doctor-photo" src="" alt="Dra. Vanessa Zaidan Silveira"
+        onerror="this.style.display='none'; document.getElementById('doctor-initials').style.display='flex'"/>
+      <div id="doctor-initials" style="display:flex;width:88px;height:88px;border-radius:50%;background:var(--burnt);align-items:center;justify-content:center;font-size:1.8rem;margin-bottom:14px;border:3px solid rgba(255,255,255,0.3);">VZ</div>
+      <div class="doctor-name">Dra. Vanessa Zaidan Silveira</div>
+      <div class="doctor-title">Cirurgiã Bucomaxilofacial · Especialista em DTM, Dor Orofacial e Bruxismo · Criadora do Método Rearticular™</div>
+    </div>
+
+    <div class="profile-body">
+
+      <!-- Assinatura -->
+      <div class="plan-card">
+        <div class="plan-badge">Plano Mensal</div>
+        <div class="plan-price"><sup>R$</sup>24<span style="font-size:1.5rem">,90</span></div>
+        <div class="plan-period">por mês · cancele quando quiser</div>
+        <ul class="plan-features">
+          <li>Check-in diário ilimitado</li>
+          <li>Todos os protocolos guiados</li>
+          <li>Botão SOS ATM</li>
+          <li>Rastreador de gatilhos</li>
+          <li>Histórico e insights semanais</li>
+          <li>Conteúdo educativo curado</li>
+          <li>Suporte entre consultas</li>
+        </ul>
+        <button class="btn-white" onclick="showToast('Em breve! Acesso antecipado disponível.')">Assinar agora →</button>
+      </div>
+
+      <!-- Conteúdo Educativo -->
+      <div class="section-title mt-8">Aprenda com a Dra. Vanessa</div>
+
+      <div class="edu-card" onclick="openEdu('atm')">
+        <div class="edu-card-top">
+          <div class="edu-icon">🦷</div>
+          <div class="edu-title">O que é a ATM e como ela funciona?</div>
+        </div>
+        <div class="edu-desc">Entenda a articulação temporomandibular de forma simples e visual.</div>
+      </div>
+
+      <div class="edu-card" onclick="openEdu('bruxismo')">
+        <div class="edu-card-top">
+          <div class="edu-icon">😬</div>
+          <div class="edu-title">Bruxismo: por que você range os dentes?</div>
+        </div>
+        <div class="edu-desc">Causas, tipos e o que o estresse tem a ver com tudo isso.</div>
+      </div>
+
+      <div class="edu-card" onclick="openEdu('gatilhos')">
+        <div class="edu-card-top">
+          <div class="edu-icon">🔍</div>
+          <div class="edu-title">Reconhecendo seus gatilhos</div>
+        </div>
+        <div class="edu-desc">Por que certos dias são mais difíceis? Aprenda a identificar padrões.</div>
+      </div>
+
+      <div class="edu-card" onclick="openEdu('habitos')">
+        <div class="edu-card-top">
+          <div class="edu-icon">💡</div>
+          <div class="edu-title">Hábitos parafuncionais</div>
+        </div>
+        <div class="edu-desc">Morder objetos, apertar os dentes, segurar tensão — como isso afeta sua ATM.</div>
+      </div>
+
+      <div class="edu-card" onclick="openEdu('alerta')">
+        <div class="edu-card-top">
+          <div class="edu-icon">⚠️</div>
+          <div class="edu-title">Sinais de alerta: quando buscar ajuda</div>
+        </div>
+        <div class="edu-desc">Quando o autocuidado não é suficiente e você precisa de avaliação profissional.</div>
+      </div>
+
+      <!-- Perfil da Usuária -->
+      <div class="section-title mt-24">Meu perfil</div>
+      <div class="card">
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div class="flex-between">
+            <span style="font-size:0.9rem;color:var(--dark);">Nome</span>
+            <span style="font-size:0.9rem;color:var(--text-muted);font-weight:500;" id="profile-name-display">—</span>
+          </div>
+          <div class="divider" style="margin:0"></div>
+          <div class="flex-between">
+            <span style="font-size:0.9rem;color:var(--dark);">Check-ins realizados</span>
+            <span style="font-size:0.9rem;color:var(--burnt);font-weight:700;" id="profile-checkins">0</span>
+          </div>
+          <div class="divider" style="margin:0"></div>
+          <div class="flex-between">
+            <span style="font-size:0.9rem;color:var(--dark);">Protocolos feitos</span>
+            <span style="font-size:0.9rem;color:var(--burnt);font-weight:700;" id="profile-protocols">0</span>
+          </div>
+          <div class="divider" style="margin:0"></div>
+          <div class="flex-between">
+            <span style="font-size:0.9rem;color:var(--dark);">Sequência atual</span>
+            <span style="font-size:0.9rem;color:var(--burnt);font-weight:700;">🔥 4 dias</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="disclaimer-box mt-16">
+        <strong>Aviso importante:</strong> O ATM Leve é uma ferramenta de educação em saúde, autocuidado e acompanhamento de sintomas. Não substitui consulta, diagnóstico ou tratamento com profissional de saúde habilitado. Em caso de dor intensa, travamento persistente, trauma, febre, inchaço, dormência ou piora súbita, procure atendimento profissional imediatamente.
+      </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+      <button class="nav-item" onclick="navTo('home')">
+        <svg viewBox="0 0 24 24"><path d="M3 9L12 2L21 9V21H15V15H9V21H3V9Z"/></svg>
+        Início
+      </button>
+      <button class="nav-item" onclick="navTo('checkin')">
+        <svg viewBox="0 0 24 24"><path d="M9 11L12 14L22 4"/><path d="M21 12V19A2 2 0 0119 21H5A2 2 0 013 19V5A2 2 0 015 3H16"/></svg>
+        Check-in
+      </button>
+      <button class="nav-item" onclick="navTo('protocols')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8V12L15 15"/></svg>
+        Protocolos
+      </button>
+      <button class="nav-item" onclick="navTo('tracker')">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Rastreador
+      </button>
+      <button class="nav-item active" onclick="navTo('edu')">
+        <svg viewBox="0 0 24 24"><path d="M20 21V19A4 4 0 0016 15H8A4 4 0 004 19V21"/><circle cx="12" cy="7" r="4"/></svg>
+        Perfil
+      </button>
+    </nav>
+  </div>
+
+  <!-- ======================================
+       MODAL: Conteúdo Educativo
+  ======================================= -->
+  <div class="modal-overlay" id="edu-modal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-inner" id="edu-modal-content"></div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+</div><!-- #app -->
+
+<script>
+// ============================================
+// STATE
+// ============================================
+const state = {
+  userName: '',
+  currentScreen: 'screen-splash',
+  checkinCount: 0,
+  protocolCount: 0,
+};
+
+// ============================================
+// NAVIGATION
+// ============================================
+function goTo(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  state.currentScreen = screenId;
+  window.scrollTo(0, 0);
+}
+
+function goToHome() {
+  goTo('screen-home');
+}
+
+function navTo(tab) {
+  const map = {
+    home: 'screen-home',
+    checkin: 'screen-checkin',
+    protocols: 'screen-protocols',
+    tracker: 'screen-tracker',
+    edu: 'screen-edu',
+  };
+  if (map[tab]) goTo(map[tab]);
+  // Reset protocols view when navigating away
+  if (tab !== 'protocols') {
+    document.getElementById('protocols-list-view').style.display = 'block';
+    document.getElementById('protocol-detail-view').style.display = 'none';
+  }
+}
+
+// ============================================
+// ONBOARDING
+// ============================================
+let onbStep = 0;
+
+function onbNext(step) {
+  if (step === 0) {
+    const name = document.getElementById('input-name').value.trim();
+    if (!name) { showToast('Por favor, digite seu nome 😊'); return; }
+    state.userName = name;
+  }
+  const next = step + 1;
+  document.getElementById(`onb-${step}`).classList.remove('active');
+  document.getElementById(`onb-${next}`).classList.add('active');
+  document.getElementById(`dot-${next}`).classList.add('done');
+  onbStep = next;
+}
+
+function onbPrev(step) {
+  const prev = step - 1;
+  document.getElementById(`onb-${step}`).classList.remove('active');
+  document.getElementById(`onb-${prev}`).classList.add('active');
+  onbStep = prev;
+}
+
+function toggleChoice(btn) {
+  btn.classList.toggle('selected');
+}
+
+function singleChoice(listId, btn) {
+  document.querySelectorAll(`#${listId} .onb-choice`).forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function finishOnboarding() {
+  // Save to localStorage
+  localStorage.setItem('atm_user_name', state.userName);
+  // Update UI
+  updateGreeting();
+  document.getElementById('profile-name-display').textContent = state.userName;
+  goTo('screen-home');
+  showToast(`Bem-vinda, ${state.userName}! 🌿`);
+}
+
+// ============================================
+// HOME — GREETING
+// ============================================
+function updateGreeting() {
+  const hour = new Date().getHours();
+  let period = 'Boa noite';
+  if (hour >= 5 && hour < 12) period = 'Bom dia';
+  else if (hour >= 12 && hour < 18) period = 'Boa tarde';
+
+  const timeEl = document.getElementById('greeting-time');
+  const nameEl = document.getElementById('greeting-name');
+  if (timeEl) timeEl.textContent = period;
+  if (nameEl) {
+    const name = state.userName || localStorage.getItem('atm_user_name') || '';
+    nameEl.innerHTML = name
+      ? `${period}, <strong>${name}</strong>.<br/>Como está sua mandíbula hoje?`
+      : `Como está sua<br/>mandíbula hoje?`;
+  }
+}
+
+// ============================================
+// CHECK-IN
+// ============================================
+const scaleValues = {};
+
+function selectScale(groupId, btn, val) {
+  document.querySelectorAll(`#${groupId} .scale-btn`).forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  scaleValues[groupId] = val;
+}
+
+function toggleChip(btn) {
+  btn.classList.toggle('selected');
+}
+
+function saveCheckin() {
+  state.checkinCount++;
+  localStorage.setItem('atm_checkins', state.checkinCount);
+  document.getElementById('profile-checkins').textContent = state.checkinCount;
+  showToast('Check-in salvo! Obrigada por cuidar de você 💚');
+  setTimeout(() => goTo('screen-home'), 1800);
+}
+
+// ============================================
+// PROTOCOLS DATA
+// ============================================
+const protocols = {
+  relaxamento: {
+    icon: '😮‍💨',
+    name: 'Relaxamento Mandibular',
+    time: '3 minutos',
+    benefit: 'Essa prática ajuda a liberar a tensão acumulada nos músculos mastigatórios — especialmente útil ao acordar, após o trabalho ou em momentos de estresse.',
+    steps: [
+      { text: '<strong>Posição:</strong> Sente-se confortavelmente. Pés no chão, ombros soltos, mãos relaxadas sobre as coxas.' },
+      { text: '<strong>Lábios unidos, dentes separados:</strong> Feche os lábios delicadamente, mas deixe os dentes de cima e de baixo sem se tocar. Este é o posicionamento ideal em repouso.' },
+      { text: '<strong>Consciência:</strong> Perceba onde está a tensão. Têmporas? Bochechas? Pescoço? Apenas observe, sem forçar.' },
+      { text: '<strong>Respiração:</strong> Inspire pelo nariz por 4 tempos, segure por 2, expire pela boca por 6 tempos. Repita 5 vezes.' },
+      { text: '<strong>Relaxamento ativo:</strong> A cada expiração, imagine a mandíbula ficando mais pesada e solta. Deixe ela cair levemente.' },
+      { text: '<strong>Finalização:</strong> Faça um sorriso suave, movimente levemente a mandíbula de um lado para o outro, e retorne ao repouso. Pronto.' },
+    ]
+  },
+  'sos-tensao': {
+    icon: '🤲',
+    name: 'Pausa Anti-bruxismo',
+    time: '2 minutos',
+    benefit: 'Quando você percebe que está apertando os dentes — no trabalho, no trânsito, olhando para telas — essa pausa ajuda a interromper o ciclo de forma consciente.',
+    steps: [
+      { text: '<strong>Perceba:</strong> Você está apertando agora? Pause tudo por um momento.' },
+      { text: '<strong>Comando mental:</strong> Diga internamente: "Lábios unidos, dentes separados, língua no céu da boca." Repita 3 vezes.' },
+      { text: '<strong>Abra levemente:</strong> Abra a boca uns 2 cm e feche devagar, sem forçar. Sinta a mandíbula se soltar.' },
+      { text: '<strong>Ombros:</strong> Levante os ombros em direção às orelhas, prenda por 3 segundos e solte de uma vez. O pescoço agradece.' },
+      { text: '<strong>Retome:</strong> Volte ao que estava fazendo, mas com consciência. A cada 30 minutos, repita o comando mental.' },
+    ]
+  },
+  respiracao: {
+    icon: '🌬️',
+    name: 'Respiração Consciente',
+    time: '4 minutos',
+    benefit: 'A respiração é a ferramenta mais poderosa para ativar o sistema nervoso parassimpático — responsável por desativar o estado de tensão do corpo. Simples e eficaz.',
+    steps: [
+      { text: '<strong>Posição:</strong> Deite ou sente com a coluna ereta. Olhos fechados se possível.' },
+      { text: '<strong>Mão no abdômen:</strong> Coloque uma mão na barriga. Ao inspirar, a barriga deve se expandir — não o peito.' },
+      { text: '<strong>Ritmo 4-7-8:</strong> Inspire pelo nariz por 4 tempos. Segure por 7. Expire lentamente pela boca por 8. Isso ativa o relaxamento profundo.' },
+      { text: '<strong>Ciclos:</strong> Repita o ritmo 4-7-8 por 4 a 6 ciclos completos. Se sentir tontura, reduza a intensidade.' },
+      { text: '<strong>Jaw drop suave:</strong> Na última expiração, deixe a mandíbula cair gentilmente. Sinta o rosto se soltar.' },
+      { text: '<strong>Retorno:</strong> Respire normalmente por 1 minuto antes de levantar. Perceba a diferença.' },
+    ]
+  },
+  automassagem: {
+    icon: '🙌',
+    name: 'Automassagem Segura',
+    time: '5 minutos',
+    benefit: 'Massagear pontos específicos da face e pescoço ajuda a liberar tensão muscular acumulada. Sempre com pressão suave — nunca forçando.',
+    steps: [
+      { text: '<strong>Músculo masseter:</strong> Com os dedos indicador e médio, pressione suavemente a região da bochecha logo acima do ângulo da mandíbula. Faça círculos lentos por 30 segundos de cada lado.' },
+      { text: '<strong>Temporal:</strong> Mova os dedos para a têmpora (lateral da cabeça). Pressão suave em movimentos circulares. 30 segundos de cada lado.' },
+      { text: '<strong>Pescoço lateral:</strong> Com os dedos em gancho, deslize suavemente do pescoço até o ombro. 3 passagens de cada lado.' },
+      { text: '<strong>Abaixo do zigomático:</strong> Deslize o dedo indicador da base do nariz até a orelha, na linha do osso zigomático. Pressão leve. 3 vezes de cada lado.' },
+      { text: '<strong>Ponto de relaxamento:</strong> Pressione o ponto entre o polegar e o indicador (mão fechada) por 30 segundos. Ajuda no relaxamento geral.' },
+      { text: '<strong>Finalização:</strong> Passe as palmas abertas suavemente pela face, pescoço e ombros, como se estivesse "lavando" a tensão.' },
+    ]
+  },
+  noturna: {
+    icon: '🌙',
+    name: 'Rotina Noturna',
+    time: '5 minutos',
+    benefit: 'Preparar o corpo para o sono — especialmente a musculatura facial — reduz o risco de ranger ou apertar os dentes durante a noite.',
+    steps: [
+      { text: '<strong>Desconexão:</strong> Pelo menos 20 minutos antes de dormir, afaste-se das telas. Coloque o celular em modo silencioso.' },
+      { text: '<strong>Posicionamento mandibular:</strong> Fique na frente do espelho por 30 segundos e observe se sua mandíbula está tensa. Corrija: lábios unidos, dentes separados.' },
+      { text: '<strong>Automassagem rápida:</strong> Massageie o masseter e as têmporas por 2 minutos, conforme o protocolo de automassagem.' },
+      { text: '<strong>Respiração 4-7-8:</strong> Realize 4 ciclos da respiração antes de deitar. Faz uma diferença real na qualidade do sono.' },
+      { text: '<strong>Postura ao deitar:</strong> Prefira dormir de lado com travesseiro entre os joelhos, ou de costas. Evite dormir de bruços — prejudica a ATM.' },
+      { text: '<strong>Intenção:</strong> Antes de dormir, diga mentalmente: "Minha mandíbula está relaxada. Vou acordar descansada." Parece simples, mas o cérebro responde.' },
+    ]
+  },
+  manha: {
+    icon: '🌅',
+    name: 'Despertar Suave',
+    time: '3 minutos',
+    benefit: 'Os primeiros minutos do dia dão o tom para a mandíbula inteira. Uma rotina matinal simples pode transformar seu dia.',
+    steps: [
+      { text: '<strong>Antes de levantar:</strong> Ainda deitada, perceba como está a mandíbula. Tensa? Pesada? Sem forçar, apenas observe.' },
+      { text: '<strong>Bocejos conscientes:</strong> Boceje suavemente 3 vezes. Isso naturalmente mobiliza a ATM com segurança.' },
+      { text: '<strong>Movimentos suaves:</strong> Mova a mandíbula de um lado para outro, lentamente, por 5 ciclos. Como se mastigasse devagar.' },
+      { text: '<strong>Calor:</strong> Se tiver tensão forte, aplique compressa morna por 2-3 minutos nos masseteres antes de se levantar.' },
+      { text: '<strong>Check-in interno:</strong> Dê uma nota de 1 a 5 para como está se sentindo. Registre no app logo depois.' },
+    ]
+  },
+};
+
+// ============================================
+// PROTOCOL DETAIL
+// ============================================
+function openProtocol(key) {
+  const p = protocols[key];
+  if (!p) return;
+
+  state.protocolCount++;
+  document.getElementById('profile-protocols').textContent = state.protocolCount;
+
+  const stepsHTML = p.steps.map((s, i) => `
+    <div class="step-item">
+      <div class="step-num">${i + 1}</div>
+      <div class="step-text">${s.text}</div>
+    </div>
+  `).join('');
+
+  const html = `
+    <div class="proto-detail-header">
+      <button class="btn-back-inline" onclick="backFromProtocol()">← Voltar</button>
+      <span class="proto-detail-icon">${p.icon}</span>
+      <div class="proto-detail-title">${p.name}</div>
+      <div class="proto-detail-meta">⏱ ${p.time} · Protocolo guiado</div>
+    </div>
+    <div class="proto-detail-body">
+      <div class="proto-benefit">${p.benefit}</div>
+      <div class="protocol-box">
+        <div class="protocol-box-title">Passo a passo</div>
+        <div class="step-list">${stepsHTML}</div>
+      </div>
+      <div class="disclaimer-box mt-16">
+        Realize esses movimentos com suavidade, sem forçar. Em caso de dor ao fazer qualquer exercício, interrompa e consulte um profissional.
+      </div>
+      <button class="btn-primary mt-16" onclick="showToast('Protocolo concluído! 🌿 +1 registrado.')">Concluir protocolo ✓</button>
+    </div>
+  `;
+
+  const listView = document.getElementById('protocols-list-view');
+  const detailView = document.getElementById('protocol-detail-view');
+  const detailContent = document.getElementById('protocol-detail-content');
+
+  if (listView && detailView && detailContent) {
+    listView.style.display = 'none';
+    detailView.style.display = 'flex';
+    detailContent.innerHTML = html;
+    goTo('screen-protocols');
+  } else {
+    // Called from home scroll — navigate and show
+    goTo('screen-protocols');
+    setTimeout(() => {
+      document.getElementById('protocols-list-view').style.display = 'none';
+      document.getElementById('protocol-detail-view').style.display = 'flex';
+      document.getElementById('protocol-detail-content').innerHTML = html;
+    }, 50);
+  }
+  window.scrollTo(0, 0);
+}
+
+function backFromProtocol() {
+  document.getElementById('protocols-list-view').style.display = 'block';
+  document.getElementById('protocol-detail-view').style.display = 'none';
+  window.scrollTo(0, 0);
+}
+
+// ============================================
+// SOS PROTOCOLS
+// ============================================
+const sosProtocols = {
+  travamento: {
+    title: 'Protocolo: Mandíbula Travada',
+    steps: [
+      { text: '<strong>Não force.</strong> Nunca tente forçar a abertura. Isso pode piorar a situação.' },
+      { text: '<strong>Calor local:</strong> Aplique uma compressa morna (não quente) sobre a ATM por 5 minutos. Isso relaxa a musculatura.' },
+      { text: '<strong>Respiração:</strong> Inspire lentamente pelo nariz por 4 tempos, expire pela boca por 6. Repita 5 vezes para reduzir a tensão muscular reflexa.' },
+      { text: '<strong>Movimento mínimo:</strong> Com suavidade, tente apenas mover a mandíbula 1-2 mm de cada lado. Sem forçar. Apenas explorando o movimento disponível.' },
+      { text: '<strong>Posição de repouso:</strong> Mantenha os lábios unidos e os dentes separados. Descanse a língua levemente no céu da boca.' },
+      { text: '<strong>⚠️ Atenção:</strong> Se o travamento não ceder em 20-30 minutos, for acompanhado de dor intensa, ou for um episódio novo, procure atendimento profissional.' },
+    ]
+  },
+  tensao: {
+    title: 'Protocolo: Tensão Facial Intensa',
+    steps: [
+      { text: '<strong>Pare o que está fazendo</strong> por 3 minutos. A tensão facial é um sinal do corpo pedindo pausa.' },
+      { text: '<strong>Respiração de resgate:</strong> 4 tempos para inspirar, 7 para segurar, 8 para expirar. Repita 4 vezes.' },
+      { text: '<strong>Solte os ombros:</strong> Encolha os ombros até as orelhas, prenda 3 segundos, solte tudo de uma vez. Repita 3 vezes.' },
+      { text: '<strong>Massagem no masseter:</strong> Pontas dos dedos em círculos suaves nas bochechas por 1 minuto.' },
+      { text: '<strong>Comando verbal:</strong> Diga em voz alta ou internamente: "Meu rosto está relaxado. Minha mandíbula está solta."' },
+    ]
+  },
+  apertamento: {
+    title: 'Protocolo: Pausa Anti-apertamento',
+    steps: [
+      { text: '<strong>Perceba:</strong> Você está apertando os dentes agora? Isso é bruxismo de vigília — e é inconsciente.' },
+      { text: '<strong>Lábios, dentes, língua:</strong> Lábios fechados. Dentes separados. Língua tocando levemente o palato. Repita como mantra.' },
+      { text: '<strong>Abra e feche suave:</strong> Abra a boca levemente (2-3 cm), segure 2 segundos, feche devagar. 5 vezes.' },
+      { text: '<strong>Âncora visual:</strong> Coloque um post-it no monitor ou defina um alarme suave a cada 40 minutos como lembrete de reposicionamento.' },
+      { text: '<strong>Hidrate-se:</strong> Beba um copo de água. A hidratação ajuda a reduzir a tensão muscular.' },
+    ]
+  },
+  manha: {
+    title: 'Protocolo: Manhã Difícil',
+    steps: [
+      { text: '<strong>Ainda deitada:</strong> Não levante rápido. Respire fundo 5 vezes antes de sair da cama.' },
+      { text: '<strong>Bocejos controlados:</strong> Boceje suavemente 3 vezes. A abertura natural mobiliza a ATM com segurança.' },
+      { text: '<strong>Compressa morna:</strong> Aplique por 3-5 minutos antes de qualquer outra atividade.' },
+      { text: '<strong>Movimento gentil:</strong> Mova a mandíbula levemente de um lado para o outro, sem forçar abertura.' },
+      { text: '<strong>Evite:</strong> Alimentos duros no café da manhã. Prefira opções macias neste dia.' },
+      { text: '<strong>Registre:</strong> Faça o check-in para acompanharmos esse padrão com você.' },
+    ]
+  },
+  ansiedade: {
+    title: 'Protocolo: Estresse e Ansiedade',
+    steps: [
+      { text: '<strong>Grounding 5-4-3-2-1:</strong> Nomeie 5 coisas que você vê, 4 que pode tocar, 3 que ouve, 2 que cheira, 1 que sente. Isso ancora o sistema nervoso.' },
+      { text: '<strong>Respiração fisiológica:</strong> Inspire normalmente, depois dê mais uma inspiração rápida pelo nariz, e expire lentamente pela boca. Repita 5 vezes.' },
+      { text: '<strong>Scan corporal:</strong> De cima pra baixo — topo da cabeça, testa, olhos, bochechas, mandíbula, pescoço, ombros. Em cada região, inspire e ao expirar solte conscientemente.' },
+      { text: '<strong>Reposicionamento mandibular:</strong> Lábios unidos. Dentes separados. Língua no céu da boca. Segure essa posição por 1 minuto enquanto respira.' },
+      { text: '<strong>Auto-compaixão:</strong> Você está fazendo o que pode. Cuidar da sua mandíbula é também cuidar de você. 💚' },
+    ]
+  },
+};
+
+function showSOSProtocol(type) {
+  const p = sosProtocols[type];
+  if (!p) return;
+
+  const stepsHTML = p.steps.map((s, i) => `
+    <div class="step-item">
+      <div class="step-num">${i + 1}</div>
+      <div class="step-text">${s.text}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('sos-protocol-content').innerHTML = `
+    <div class="protocol-box">
+      <div class="protocol-box-title">${p.title}</div>
+      <div class="step-list">${stepsHTML}</div>
+    </div>
+    <div class="disclaimer-box mt-16">
+      Se os sintomas persistirem, piorarem ou surgirem sinais de alerta como dor intensa, inchaço, febre ou dormência — procure atendimento profissional imediatamente.
+    </div>
+    <button class="btn-primary mt-16" onclick="showToast('Que bom! Cuide-se sempre. 💚')">Me sinto melhor ✓</button>
+  `;
+
+  document.getElementById('sos-menu').style.display = 'none';
+  document.getElementById('sos-protocol').style.display = 'block';
+  window.scrollTo(0, 0);
+}
+
+// ============================================
+// EDUCAÇÃO MODAL
+// ============================================
+const eduContent = {
+  atm: {
+    title: 'O que é a ATM?',
+    icon: '🦷',
+    content: `
+      <p style="font-size:0.95rem;color:var(--dark);line-height:1.75;margin-bottom:16px;">
+        A <strong>ATM</strong> — articulação temporomandibular — é a junção entre o osso temporal (crânio) e a mandíbula. São duas articulações, uma de cada lado do rosto, que trabalham juntas o tempo todo.
+      </p>
+      <p style="font-size:0.95rem;color:var(--dark);line-height:1.75;margin-bottom:16px;">
+        Ela participa de tudo: mastigar, falar, bocejar, engolir. É uma das articulações mais usadas do corpo — e por isso, muito suscetível a sobrecargas.
+      </p>
+      <p style="font-size:0.95rem;color:var(--dark);line-height:1.75;margin-bottom:16px;">
+        Quando há <strong>desequilíbrio muscular, bruxismo, má postura ou estresse crônico</strong>, a ATM começa a dar sinais: estalos, dor, travamento, tensão facial.
+      </p>
+      <div style="background:var(--blue-grey-light);padding:14px;border-radius:10px;font-size:0.85rem;color:var(--dark);line-height:1.6;">
+        💡 O repouso ideal da mandíbula: <strong>lábios fechados, dentes separados, língua no céu da boca</strong>. Se você perceber que está mordendo os dentes durante o dia, é um sinal de sobrecarga.
+      </div>
+    `
+  },
+  bruxismo: {
+    title: 'Por que você range os dentes?',
+    icon: '😬',
+    content: `
+      <p style="font-size:0.95rem;color:var(--dark);line-height:1.75;margin-bottom:16px;">
+        O <strong>bruxismo</strong> é o hábito involuntário de apertar ou ranger os dentes. Ele pode acontecer à noite (durante o sono) ou durante o dia — chamado de <strong>bruxismo de vigília</strong>.
+      </p>
+      <p style="font-size:0.95rem;color:var(--dark);line-height:1.75;margin-bottom:16px;">
+        As causas são multifatoriais: <strong>estresse, ansiedade, genética, alterações no sono e hábitos parafuncionais</strong>. Não existe uma causa única.
+      </p>
+      <p style="font-size:0.95rem;color:var(--dark);line-height:1.75;margin-bottom:16px;">
+        Os sinais mais comuns: acordar com a mandíbula cansada, dores de cabeça matinais, sensibilidade dentária e desgaste nos dentes.
+      </p>
+      <div style="background:#FDF1EB;padding:14px;border-radius:10px;font-size:0.85rem;color:var(--burnt);line-height:1.6;border-left:3px solid var(--burnt);">
+        ⚠️ O bruxismo não tem cura definitiva, mas tem manejo. Placa oclusal, fisioterapia, acompanhamento emocional e autocuidado diário fazem toda a diferença.
+      </div>
+    `
+  },
+  gatilhos: {
+    title: 'Reconhecendo seus gatilhos',
+    icon: '🔍',
+    content: `
+      <p style="font-size:0.95rem;color:var(--dark);line-height:1.75;margin-bottom:16px;">
+        Um <strong>gatilho</strong> é qualquer fator que aumenta a tensão muscular, piora o bruxismo ou intensifica os sintomas da DTM. Entender os seus é o primeiro passo do autocuidado.
+      </p>
+      <p style="font-size:0.85rem;font-weight:600;color:var(--dark);margin-bottom:10px;">Gatilhos mais comuns:</p>
+      <ul style="font-size:0.88rem;color:var(--dark);line-height:2;padding-left:18px;margin-bottom:16px;">
+        <li>Estresse e ansiedade</li>
+        <li>Sono de má qualidade</li>
+        <li>Excesso de cafeína</li>
+        <li>Postura inadequada (especialmente na mesa de trabalho)</li>
+        <li>Ciclo menstrual (variações hormonais impactam a dor)</li>
+        <li>Alimentos duros ou mastigação excessiva</li>
+        <li>Longos períodos na frente de telas</li>
+        <li>Hábitos como morder canetas, lápis ou unhas</li>
+      </ul>
+      <div style="background:var(--blue-grey-light);padding:14px;border-radius:10px;font-size:0.85rem;color:var(--dark);line-height:1.6;">
+        💡 Use o rastreador do ATM Leve para identificar quais gatilhos aparecem nos seus dias de maior tensão. Com o tempo, padrões surgem — e você ganha poder sobre eles.
+      </div>
+    `
+  },
+  habitos: {
+    title: 'Hábitos parafuncionais',
+    icon: '💡',
+    content: `
+      <p style="font-size:0.95rem;color:var(--dark);line-height:1.75;margin-bottom:16px;">
+        <strong>Hábitos parafuncionais</strong> são comportamentos que sobrecarregam a ATM sem nenhuma função real de mastigação. Geralmente são inconscientes.
+      </p>
+      <p style="font-size:0.85rem;font-weight:600;color:var(--dark);margin-bottom:10px;">Exemplos:</p>
+      <ul style="font-size:0.88rem;color:var(--dark);line-height:2;padding-left:18px;margin-bottom:16px;">
+        <li>Apertar os dentes durante concentração</li>
+        <li>Morder canetas, tampas ou objetos</li>
+        <li>Roer unhas</li>
+        <li>Mascar chicletes por longos períodos</li>
+        <li>Apoiar o queixo na mão com pressão</li>
+        <li>Dormir de bruços</li>
+        <li>Segurar o telefone entre ombro e orelha</li>
+        <li>Morder o lábio ou bochecha internamente</li>
+      </ul>
+      <div style="background:#FDF1EB;padding:14px;border-radius:10px;font-size:0.85rem;color:var(--burnt);line-height:1.6;border-left:3px solid var(--burnt);">
+        A consciência é o primeiro passo. Não se culpe — mas observe. O rastreador ajuda você a perceber quando esses hábitos aparecem.
+      </div>
+    `
+  },
+  alerta: {
+    title: 'Quando buscar ajuda profissional',
+    icon: '⚠️',
+    content: `
+      <p style="font-size:0.95rem;color:var(--dark);line-height:1.75;margin-bottom:16px;">
+        O ATM Leve é uma ferramenta de autocuidado e educação. Mas existem situações em que a avaliação profissional é essencial — e não deve ser adiada.
+      </p>
+      <p style="font-size:0.85rem;font-weight:600;color:var(--dark);margin-bottom:10px;">Procure um profissional se você notar:</p>
+      <ul style="font-size:0.88rem;color:var(--dark);line-height:2;padding-left:18px;margin-bottom:16px;">
+        <li>Dor intensa ou súbita na mandíbula ou rosto</li>
+        <li>Travamento persistente (não consegue abrir ou fechar)</li>
+        <li>Inchaço ou vermelhidão na região</li>
+        <li>Febre associada à dor</li>
+        <li>Dormência no rosto, lábios ou língua</li>
+        <li>Dificuldade para engolir ou respirar</li>
+        <li>Piora progressiva apesar do autocuidado</li>
+        <li>Trauma recente (batida, queda, procedimento odontológico)</li>
+        <li>Qualquer situação que gere insegurança importante</li>
+      </ul>
+      <div style="background:var(--blue-grey-light);padding:14px;border-radius:10px;font-size:0.85rem;color:var(--dark);line-height:1.6;">
+        💙 Cuidar de você com responsabilidade inclui saber quando buscar ajuda. O autocuidado e o acompanhamento profissional andam juntos.
+      </div>
+    `
+  }
+};
+
+function openEdu(key) {
+  const e = eduContent[key];
+  if (!e) return;
+  document.getElementById('edu-modal-content').innerHTML = `
+    <div style="font-size:2rem;margin-bottom:12px;">${e.icon}</div>
+    <h2 style="font-family:var(--font);font-size:1.3rem;color:var(--dark);font-weight:400;margin-bottom:20px;line-height:1.3;">${e.title}</h2>
+    ${e.content}
+    <button class="btn-primary" style="margin-top:24px;" onclick="closeEduModal()">Fechar</button>
+  `;
+  document.getElementById('edu-modal').classList.add('open');
+}
+
+function closeEduModal() {
+  document.getElementById('edu-modal').classList.remove('open');
+}
+
+document.getElementById('edu-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeEduModal();
+});
+
+// ============================================
+// TOAST
+// ============================================
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ============================================
+// DOCTOR PHOTO
+// ============================================
+// A foto da Dra. Vanessa deve ser colocada no mesmo diretório
+// com o nome "dra-vanessa.jpg"
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('doctor-photo').src = 'dra-vanessa.jpg';
+
+  // Restore state
+  const savedName = localStorage.getItem('atm_user_name');
+  if (savedName) {
+    state.userName = savedName;
+    document.getElementById('profile-name-display').textContent = savedName;
+  }
+  const savedCheckins = localStorage.getItem('atm_checkins');
+  if (savedCheckins) {
+    state.checkinCount = parseInt(savedCheckins);
+    document.getElementById('profile-checkins').textContent = state.checkinCount;
+  }
+
+  updateGreeting();
+});
+</script>
+</body>
+</html>
