@@ -1727,7 +1727,7 @@
       <!-- Sintomas -->
       <div class="question-block">
         <div class="question-label">4. Quais sintomas você notou hoje? (pode marcar mais de um)</div>
-        <div class="toggle-row">
+        <div class="toggle-row" id="sintomas-row">
           <button class="toggle-chip" onclick="toggleChip(this)">😴 Mandíbula cansada</button>
           <button class="toggle-chip" onclick="toggleChip(this)">🦷 Apertamento</button>
           <button class="toggle-chip" onclick="toggleChip(this)">🔊 Estalo</button>
@@ -2286,7 +2286,32 @@
 // ============================================
 // STATE
 // ============================================
-const state = {
+// ============================================
+// SUPABASE CLIENT
+// ============================================
+const SUPABASE_URL = 'https://lrmurqnmubyoyrczsfib.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxybXVycW5tdWJ5b3lyY3pzZmliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5Njg4MjUsImV4cCI6MjEwNDU0NDgyNX0.Sl4W_tF8SfzjhKnNXrLK8neMLQ-YhNwJhi_R_RrP-tY';
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+async function getUserId() {
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (session?.user) {
+    return session.user.id;
+  }
+
+  const { data, error } = await supabase.auth.signInAnonymously();
+
+  if (error) {
+    console.error('Erro ao criar sessão anônima:', error);
+    return null;
+  }
+
+  return data.user.id;
+}
+
+  const state = {
   userName: '',
   currentScreen: 'screen-splash',
   checkinCount: 0,
@@ -2402,7 +2427,55 @@ function toggleChip(btn) {
   btn.classList.toggle('selected');
 }
 
-function saveCheckin() {
+function sugerirProtocolo() {
+  const dor = scaleValues['scale-dor'] || 0;
+  const sono = scaleValues['scale-sono'] || 0;
+  const estresse = scaleValues['scale-estresse'] || 0;
+
+  const chips = document.querySelectorAll('#sintomas-row .toggle-chip.selected');
+  const temTravamento = Array.from(chips).some(el => el.textContent.includes('Travamento'));
+  const temApertamento = Array.from(chips).some(el => el.textContent.includes('Apertamento'));
+
+  if (temTravamento) return 'travamento';
+  if (temApertamento) return 'sos-tensao';
+  if (estresse >= 4) return 'respiracao';
+  if (sono <= 2) return 'noturna';
+  if (dor >= 4) return 'relaxamento';
+  return 'automassagem';
+}
+
+async function saveCheckin() {
+  const userId = await getUserId();
+
+  if (!userId) {
+    showToast('Erro ao salvar. Tente novamente.');
+    return;
+  }
+
+  const chips = document.querySelectorAll('#sintomas-row .toggle-chip.selected');
+  const temTravamento = Array.from(chips).some(el => el.textContent.includes('Travamento'));
+  const temApertamento = Array.from(chips).some(el => el.textContent.includes('Apertamento'));
+
+  const payload = {
+    user_id: userId,
+    data: new Date().toISOString().split('T')[0],
+    dor_intensidade: scaleValues['scale-dor'] || null,
+    qualidade_sono: scaleValues['scale-sono'] || null,
+    nivel_estresse: scaleValues['scale-estresse'] || null,
+    travamento: temTravamento,
+    apertamento: temApertamento,
+    observacoes: document.querySelector('.textarea-input').value || null,
+    protocolo_sugerido: sugerirProtocolo(),
+  };
+
+  const { error } = await supabase.from('checkins').insert([payload]);
+
+  if (error) {
+    console.error('Erro ao salvar check-in:', error);
+    showToast('Erro ao salvar. Tente novamente.');
+    return;
+  }
+
   state.checkinCount++;
   localStorage.setItem('atm_checkins', state.checkinCount);
   document.getElementById('profile-checkins').textContent = state.checkinCount;
