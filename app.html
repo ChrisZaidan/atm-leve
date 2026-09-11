@@ -1581,11 +1581,11 @@
       </div>
 
       <!-- Check-in Card -->
-      <div class="card">
-        <div class="card-label">Check-in de hoje</div>
-        <div class="card-title">Como você está se sentindo?</div>
-        <div class="card-desc">Leva menos de 2 minutos. Suas respostas ajudam a personalizar as recomendações do dia.</div>
-        <button class="btn-card" onclick="goTo('screen-checkin')">Fazer check-in →</button>
+      <div class="card" id="home-checkin-card">
+        <div class="card-label" id="home-checkin-label">Check-in de hoje</div>
+        <div class="card-title" id="home-checkin-title">Como você está se sentindo?</div>
+        <div class="card-desc" id="home-checkin-desc">Leva menos de 2 minutos. Suas respostas ajudam a personalizar as recomendações do dia.</div>
+        <button class="btn-card" id="home-checkin-btn" onclick="goTo('screen-checkin')">Fazer check-in →</button>
       </div>
 
       <!-- Protocolos Rápidos -->
@@ -1744,7 +1744,7 @@
       <!-- Gatilhos -->
       <div class="question-block">
         <div class="question-label">5. Algum gatilho presente hoje?</div>
-        <div class="toggle-row">
+        <div class="toggle-row" id="gatilhos-row">
           <button class="toggle-chip" onclick="toggleChip(this)">☕ Muito café</button>
           <button class="toggle-chip" onclick="toggleChip(this)">📱 Muitas telas</button>
           <button class="toggle-chip" onclick="toggleChip(this)">💼 Trabalho intenso</button>
@@ -2467,44 +2467,80 @@ function sugerirProtocolo() {
   return 'automassagem';
 }
 
-async function saveCheckin() {
-  const userId = await getUserId();
+function updateHomeCheckinUI(lastCheckin) {
+  const label = document.getElementById('home-checkin-label');
+  const title = document.getElementById('home-checkin-title');
+  const desc = document.getElementById('home-checkin-desc');
+  const btn = document.getElementById('home-checkin-btn');
+  if (!label || !title) return;
 
-  if (!userId) {
-    showToast('Erro ao salvar. Tente novamente.');
-    return;
+  if (lastCheckin) {
+    label.textContent = 'Check-in de hoje concluído ✅';
+    label.style.color = 'var(--burnt, #C4622D)';
+    const dorNivel = lastCheckin.dor_intensidade ? `Nível de desconforto: ${lastCheckin.dor_intensidade}/5` : 'Sintomas registrados';
+    title.textContent = dorNivel;
+    const protoKey = lastCheckin.protocolo_sugerido || 'relaxamento';
+    const protoObj = (typeof protocols !== 'undefined' && protocols[protoKey]) ? protocols[protoKey] : null;
+    const protoNome = protoObj ? protoObj.name : 'Relaxamento Mandibular';
+    desc.innerHTML = `Recomendação para seu momento: <strong>${protoNome}</strong>. Excelente cuidado diário!`;
+    if (btn) {
+      btn.textContent = `Iniciar protocolo sugerido (${protoNome}) →`;
+      btn.onclick = () => openProtocol(protoKey);
+    }
   }
+}
 
-  const chips = document.querySelectorAll('#sintomas-row .toggle-chip.selected');
-  const temTravamento = Array.from(chips).some(el => el.textContent.includes('Travamento'));
-  const temApertamento = Array.from(chips).some(el => el.textContent.includes('Apertamento'));
+function saveCheckin() {
+  const userId = getUserId();
+
+  const sintomasChips = document.querySelectorAll('#sintomas-row .toggle-chip.selected');
+  const sintomas = Array.from(sintomasChips).map(el => el.textContent.trim());
+  const temTravamento = sintomas.some(s => s.includes('Travamento'));
+  const temApertamento = sintomas.some(s => s.includes('Apertamento'));
+
+  const gatilhosChips = document.querySelectorAll('#gatilhos-row .toggle-chip.selected');
+  const gatilhos = Array.from(gatilhosChips).map(el => el.textContent.trim());
+
+  const obsInput = document.querySelector('.textarea-input');
+  const observacoes = obsInput ? obsInput.value.trim() : '';
 
   const payload = {
     user_id: userId,
-    data: new Date().toISOString().split('T')[0],
+    data: new Date().toISOString(),
+    data_formatada: new Date().toLocaleDateString('pt-BR'),
     dor_intensidade: scaleValues['scale-dor'] || null,
     qualidade_sono: scaleValues['scale-sono'] || null,
     nivel_estresse: scaleValues['scale-estresse'] || null,
     travamento: temTravamento,
     apertamento: temApertamento,
-    observacoes: document.querySelector('.textarea-input').value || null,
+    sintomas: sintomas,
+    gatilhos: gatilhos,
+    observacoes: observacoes || null,
     protocolo_sugerido: sugerirProtocolo(),
   };
 
-  if (supabase) {
-    try {
-      const { error } = await supabase.from('checkins').insert([payload]);
-      if (error) console.warn('Aviso Supabase checkin:', error);
-    } catch (err) {
-      console.warn('Erro ao conectar com Supabase:', err);
-    }
+  // Salva no localStorage (histórico e último check-in)
+  try {
+    localStorage.setItem('atm_last_checkin', JSON.stringify(payload));
+    const history = JSON.parse(localStorage.getItem('atm_checkin_history') || '[]');
+    history.push(payload);
+    localStorage.setItem('atm_checkin_history', JSON.stringify(history));
+  } catch (e) {
+    console.warn('Erro ao salvar no storage:', e);
   }
 
-  state.checkinCount++;
+  // Atualiza contador de check-ins
+  state.checkinCount = (state.checkinCount || 0) + 1;
   localStorage.setItem('atm_checkins', state.checkinCount);
-  document.getElementById('profile-checkins').textContent = state.checkinCount;
-  showToast('Check-in salvo! Obrigada por cuidar de você 💚');
-  setTimeout(() => goTo('screen-home'), 1800);
+  const profileCountEl = document.getElementById('profile-checkins');
+  if (profileCountEl) profileCountEl.textContent = state.checkinCount;
+
+  // Atualiza card de check-in na tela inicial
+  updateHomeCheckinUI(payload);
+
+  // Notifica o usuário e volta para a tela inicial
+  showToast('Check-in salvo com sucesso! Obrigada por cuidar de você 💚');
+  setTimeout(() => goTo('screen-home'), 1400);
 }
 
 // ============================================
@@ -2910,6 +2946,14 @@ function initApp() {
   }
 
   updateGreeting();
+
+  // Restore last checkin
+  try {
+    const lastCheckinStr = localStorage.getItem('atm_last_checkin');
+    if (lastCheckinStr) {
+      updateHomeCheckinUI(JSON.parse(lastCheckinStr));
+    }
+  } catch(e) {}
 }
 
 if (document.readyState === 'loading') {
