@@ -4,7 +4,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 <title>ATM Leve</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   /* =========================================
      DESIGN TOKENS
@@ -2285,43 +2284,19 @@
 
 <script>
 // ============================================
-// STATE
 // ============================================
+// STATE & STORAGE
 // ============================================
-// SUPABASE CLIENT
-// ============================================
-const SUPABASE_URL = 'https://lrmurqnmubyoyrczsfib.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxybXVycW5tdWJ5b3lyY3pzZmliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5Njg4MjUsImV4cCI6MjEwNDU0NDgyNX0.Sl4W_tF8SfzjhKnNXrLK8neMLQ-YhNwJhi_R_RrP-tY';
-
-let supabase = null;
-try {
-  if (window.supabase && typeof window.supabase.createClient === 'function') {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+function getUserId() {
+  let id = localStorage.getItem('atm_user_id');
+  if (!id) {
+    id = 'u_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
+    localStorage.setItem('atm_user_id', id);
   }
-} catch (e) {
-  console.warn('Supabase não inicializado:', e);
+  return id;
 }
 
-async function getUserId() {
-  if (!supabase) return null;
-  try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.user) {
-      return session.user.id;
-    }
-    const { data, error } = await supabase.auth.signInAnonymously();
-    if (error) {
-      console.error('Erro ao criar sessão anônima:', error);
-      return null;
-    }
-    return data?.user?.id || null;
-  } catch (e) {
-    console.error('Erro auth Supabase:', e);
-    return null;
-  }
-}
-
-  const state = {
+const state = {
   userName: '',
   currentScreen: 'screen-splash',
   checkinCount: 0,
@@ -2333,8 +2308,14 @@ async function getUserId() {
 // ============================================
 function goTo(screenId) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(screenId).classList.add('active');
+  const target = document.getElementById(screenId);
+  if (target) {
+    target.classList.add('active');
+  }
   state.currentScreen = screenId;
+  if (screenId === 'screen-onboarding') {
+    resetOnboarding();
+  }
   window.scrollTo(0, 0);
 }
 
@@ -2351,10 +2332,11 @@ function navTo(tab) {
     edu: 'screen-edu',
   };
   if (map[tab]) goTo(map[tab]);
-  // Reset protocols view when navigating away
   if (tab !== 'protocols') {
-    document.getElementById('protocols-list-view').style.display = 'block';
-    document.getElementById('protocol-detail-view').style.display = 'none';
+    const listEl = document.getElementById('protocols-list-view');
+    const detailEl = document.getElementById('protocol-detail-view');
+    if (listEl) listEl.style.display = 'block';
+    if (detailEl) detailEl.style.display = 'none';
   }
 }
 
@@ -2363,24 +2345,55 @@ function navTo(tab) {
 // ============================================
 let onbStep = 0;
 
+function resetOnboarding() {
+  document.querySelectorAll('.onb-step').forEach(s => s.classList.remove('active'));
+  const step0 = document.getElementById('onb-0');
+  if (step0) step0.classList.add('active');
+  document.querySelectorAll('.onb-dot').forEach((d, i) => {
+    if (i === 0) d.classList.add('done');
+    else d.classList.remove('done');
+  });
+  onbStep = 0;
+  const input = document.getElementById('input-name');
+  if (input) {
+    if (state.userName) input.value = state.userName;
+    setTimeout(() => input.focus(), 150);
+  }
+}
+
 function onbNext(step) {
   if (step === 0) {
-    const name = document.getElementById('input-name').value.trim();
-    if (!name) { showToast('Por favor, digite seu nome 😊'); return; }
+    const inputEl = document.getElementById('input-name');
+    const name = inputEl ? inputEl.value.trim() : '';
+    if (!name) {
+      showToast('Por favor, digite seu nome 😊');
+      if (inputEl) inputEl.focus();
+      return;
+    }
     state.userName = name;
+    localStorage.setItem('atm_user_name', name);
   }
   const next = step + 1;
-  document.getElementById(`onb-${step}`).classList.remove('active');
-  document.getElementById(`onb-${next}`).classList.add('active');
-  document.getElementById(`dot-${next}`).classList.add('done');
+  const currEl = document.getElementById(`onb-${step}`);
+  const nextEl = document.getElementById(`onb-${next}`);
+  const dotEl = document.getElementById(`dot-${next}`);
+  if (currEl) currEl.classList.remove('active');
+  if (nextEl) nextEl.classList.add('active');
+  if (dotEl) dotEl.classList.add('done');
   onbStep = next;
+  window.scrollTo(0, 0);
 }
 
 function onbPrev(step) {
   const prev = step - 1;
-  document.getElementById(`onb-${step}`).classList.remove('active');
-  document.getElementById(`onb-${prev}`).classList.add('active');
+  const currEl = document.getElementById(`onb-${step}`);
+  const prevEl = document.getElementById(`onb-${prev}`);
+  const dotEl = document.getElementById(`dot-${step}`);
+  if (currEl) currEl.classList.remove('active');
+  if (prevEl) prevEl.classList.add('active');
+  if (dotEl) dotEl.classList.remove('done');
   onbStep = prev;
+  window.scrollTo(0, 0);
 }
 
 function toggleChoice(btn) {
@@ -2878,23 +2891,32 @@ function showToast(msg) {
 // ============================================
 // A foto da Dra. Vanessa deve ser colocada no mesmo diretório
 // com o nome "dra-vanessa.jpg"
-window.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('doctor-photo').src = 'dra-vanessa.jpg';
+function initApp() {
+  const photo = document.getElementById('doctor-photo');
+  if (photo) photo.src = 'dra-vanessa.jpg';
 
   // Restore state
   const savedName = localStorage.getItem('atm_user_name');
   if (savedName) {
     state.userName = savedName;
-    document.getElementById('profile-name-display').textContent = savedName;
+    const nameDisplay = document.getElementById('profile-name-display');
+    if (nameDisplay) nameDisplay.textContent = savedName;
   }
   const savedCheckins = localStorage.getItem('atm_checkins');
   if (savedCheckins) {
-    state.checkinCount = parseInt(savedCheckins);
-    document.getElementById('profile-checkins').textContent = state.checkinCount;
+    state.checkinCount = parseInt(savedCheckins) || 0;
+    const checkinsDisplay = document.getElementById('profile-checkins');
+    if (checkinsDisplay) checkinsDisplay.textContent = state.checkinCount;
   }
 
   updateGreeting();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
 </script>
 </body>
 </html>
