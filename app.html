@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 <title>ATM Leve</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   /* =========================================
      DESIGN TOKENS
@@ -2292,23 +2293,32 @@
 const SUPABASE_URL = 'https://lrmurqnmubyoyrczsfib.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxybXVycW5tdWJ5b3lyY3pzZmliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg5Njg4MjUsImV4cCI6MjEwNDU0NDgyNX0.Sl4W_tF8SfzjhKnNXrLK8neMLQ-YhNwJhi_R_RrP-tY';
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let supabase = null;
+try {
+  if (window.supabase && typeof window.supabase.createClient === 'function') {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+} catch (e) {
+  console.warn('Supabase não inicializado:', e);
+}
 
 async function getUserId() {
-  const { data: { session } } = await supabase.auth.getSession();
-
-  if (session?.user) {
-    return session.user.id;
-  }
-
-  const { data, error } = await supabase.auth.signInAnonymously();
-
-  if (error) {
-    console.error('Erro ao criar sessão anônima:', error);
+  if (!supabase) return null;
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      return session.user.id;
+    }
+    const { data, error } = await supabase.auth.signInAnonymously();
+    if (error) {
+      console.error('Erro ao criar sessão anônima:', error);
+      return null;
+    }
+    return data?.user?.id || null;
+  } catch (e) {
+    console.error('Erro auth Supabase:', e);
     return null;
   }
-
-  return data.user.id;
 }
 
   const state = {
@@ -2468,12 +2478,13 @@ async function saveCheckin() {
     protocolo_sugerido: sugerirProtocolo(),
   };
 
-  const { error } = await supabase.from('checkins').insert([payload]);
-
-  if (error) {
-    console.error('Erro ao salvar check-in:', error);
-    showToast('Erro ao salvar. Tente novamente.');
-    return;
+  if (supabase) {
+    try {
+      const { error } = await supabase.from('checkins').insert([payload]);
+      if (error) console.warn('Aviso Supabase checkin:', error);
+    } catch (err) {
+      console.warn('Erro ao conectar com Supabase:', err);
+    }
   }
 
   state.checkinCount++;
