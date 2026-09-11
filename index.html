@@ -1253,16 +1253,16 @@
             <p class="lead">Entre em contato e a Dra. Vanessa responderá em breve.</p>
 
             <div class="contact-form-wrap">
-                <!-- Formulário -->
+                <!-- Formulário via Formspree -->
                 <form id="contact-form">
                     <div class="form-row">
                         <div class="form-group">
                             <label for="cf-name">Seu nome</label>
-                            <input type="text" id="cf-name" name="from_name" placeholder="Maria Silva" required />
+                            <input type="text" id="cf-name" name="name" placeholder="Maria Silva" required />
                         </div>
                         <div class="form-group">
                             <label for="cf-email">Seu e-mail</label>
-                            <input type="email" id="cf-email" name="from_email" placeholder="maria@email.com" required />
+                            <input type="email" id="cf-email" name="email" placeholder="maria@email.com" required />
                         </div>
                     </div>
                     <div class="form-group">
@@ -1342,14 +1342,8 @@
         </div>
     </footer>
 
-    <!-- EmailJS — envio de e-mail sem backend -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <!-- Formspree — envio de e-mail sem backend -->
     <script>
-        // Inicializa EmailJS com a chave pública do serviço
-        (function () {
-            emailjs.init({ publicKey: "Fju1bomlKayamb_a1" });
-        })();
-
         document.getElementById('contact-form').addEventListener('submit', function (e) {
             e.preventDefault();
 
@@ -1357,25 +1351,26 @@
             btn.disabled = true;
             btn.textContent = 'Enviando...';
 
-            const params = {
-                from_name:  document.getElementById('cf-name').value,
-                from_email: document.getElementById('cf-email').value,
-                subject:    document.getElementById('cf-subject').value,
-                message:    document.getElementById('cf-message').value,
-                to_email:   'uvzaidansilveira@gmail.com',
-            };
+            const data = new FormData(this);
 
-            emailjs.send('service_19470pq', 'template_givfg29', params)
-                .then(function () {
+            fetch('https://formspree.io/f/xljezojk', {
+                method: 'POST',
+                body: data,
+                headers: { 'Accept': 'application/json' }
+            })
+            .then(function (response) {
+                if (response.ok) {
                     document.getElementById('contact-form').style.display = 'none';
                     document.getElementById('form-success').style.display = 'block';
-                })
-                .catch(function (err) {
-                    console.error('Erro ao enviar:', err);
-                    btn.disabled = false;
-                    btn.textContent = 'Enviar mensagem 💌';
-                    alert('Ops! Não foi possível enviar. Por favor, tente pelo WhatsApp.');
-                });
+                } else {
+                    throw new Error('Erro no envio');
+                }
+            })
+            .catch(function () {
+                btn.disabled = false;
+                btn.textContent = 'Enviar mensagem 💌';
+                alert('Ops! Não foi possível enviar. Por favor, tente pelo WhatsApp.');
+            });
         });
     </script>
 
