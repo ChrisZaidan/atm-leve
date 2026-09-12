@@ -604,6 +604,12 @@
     border: 2px solid var(--blue-grey-dark);
     color: var(--dark);
   }
+  .streak-day.done.today {
+    background: var(--burnt);
+    border: 2px solid var(--dark);
+    box-shadow: 0 0 0 2px var(--burnt-light);
+    color: #fff;
+  }
 
   /* =========================================
      CHECK-IN SCREEN
@@ -1568,16 +1574,10 @@
       <!-- Streak -->
       <div class="section-title">
         <span>Sua sequência</span>
-        <span style="font-size:0.85rem; color:var(--burnt);">🔥 4 dias</span>
+        <span style="font-size:0.85rem; color:var(--burnt);" id="home-streak-badge">🔥 1 dia</span>
       </div>
-      <div class="streak-row">
-        <div class="streak-day done"><span>S</span></div>
-        <div class="streak-day done"><span>T</span></div>
-        <div class="streak-day done"><span>Q</span></div>
-        <div class="streak-day done"><span>Q</span></div>
-        <div class="streak-day today"><span>S</span></div>
-        <div class="streak-day"><span>S</span></div>
-        <div class="streak-day"><span>D</span></div>
+      <div class="streak-row" id="home-streak-row">
+        <!-- Renderizado dinamicamente com base no dia e check-ins reais -->
       </div>
 
       <!-- Check-in Card -->
@@ -1996,7 +1996,7 @@
       <!-- Gráfico de tensão -->
       <div class="chart-wrap">
         <div class="chart-title">Tensão facial — últimos 7 dias</div>
-        <div class="bar-chart">
+        <div class="bar-chart" id="tracker-bar-chart">
           <div class="bar-col">
             <div class="bar-fill high" style="height:80%"></div>
             <div class="bar-day">S</div>
@@ -2232,7 +2232,7 @@
           <div class="divider" style="margin:0"></div>
           <div class="flex-between">
             <span style="font-size:0.9rem;color:var(--dark);">Sequência atual</span>
-            <span style="font-size:0.9rem;color:var(--burnt);font-weight:700;">🔥 4 dias</span>
+            <span style="font-size:0.9rem;color:var(--burnt);font-weight:700;" id="profile-streak">🌱 Começando</span>
           </div>
         </div>
       </div>
@@ -2490,6 +2490,125 @@ function updateHomeCheckinUI(lastCheckin) {
   }
 }
 
+function getWeekDates() {
+  const now = new Date();
+  const dayOfWeek = (now.getDay() + 6) % 7; // 0=Seg, 1=Ter, ..., 5=Sab, 6=Dom
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - dayOfWeek);
+  monday.setHours(0, 0, 0, 0);
+
+  const dates = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    dates.push(d.toLocaleDateString('pt-BR'));
+  }
+  return dates;
+}
+
+function updateStreakUI() {
+  const streakRow = document.getElementById('home-streak-row');
+  const streakBadge = document.getElementById('home-streak-badge');
+  const profileStreak = document.getElementById('profile-streak');
+  if (!streakRow) return;
+
+  let history = [];
+  try {
+    history = JSON.parse(localStorage.getItem('atm_checkin_history') || '[]');
+  } catch(e) {}
+
+  const checkedDates = new Set();
+  history.forEach(c => {
+    if (c.data_formatada) checkedDates.add(c.data_formatada);
+    else if (c.data) checkedDates.add(new Date(c.data).toLocaleDateString('pt-BR'));
+  });
+
+  const weekDaysLetters = ['S', 'T', 'Q', 'Q', 'S', 'S', 'D'];
+  const weekDayNames = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
+  const weekDates = getWeekDates();
+  const now = new Date();
+  const todayIndex = (now.getDay() + 6) % 7;
+  const todayFormatted = now.toLocaleDateString('pt-BR');
+
+  let html = '';
+  weekDaysLetters.forEach((letter, i) => {
+    const dateStr = weekDates[i];
+    const isDone = checkedDates.has(dateStr);
+    const isToday = (i === todayIndex);
+
+    let classes = ['streak-day'];
+    if (isDone) classes.push('done');
+    if (isToday) classes.push('today');
+
+    html += `<div class="${classes.join(' ')}" title="${weekDayNames[i]} (${dateStr})">
+      <span>${letter}</span>
+      ${isDone ? '<span style="font-size:0.55rem;line-height:1;">✓</span>' : ''}
+    </div>`;
+  });
+  streakRow.innerHTML = html;
+
+  let streak = 0;
+  let cursor = new Date(now);
+  cursor.setHours(0, 0, 0, 0);
+
+  if (checkedDates.has(todayFormatted)) {
+    while (checkedDates.has(cursor.toLocaleDateString('pt-BR'))) {
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+  } else {
+    cursor.setDate(cursor.getDate() - 1);
+    while (checkedDates.has(cursor.toLocaleDateString('pt-BR'))) {
+      streak++;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+  }
+
+  const streakStr = streak === 1 ? '🔥 1 dia' : (streak > 1 ? `🔥 ${streak} dias` : '🌱 Começando');
+  if (streakBadge) streakBadge.textContent = streakStr;
+  if (profileStreak) profileStreak.textContent = streakStr;
+}
+
+function updateTrackerUI() {
+  const chartEl = document.getElementById('tracker-bar-chart');
+  if (!chartEl) return;
+
+  let history = [];
+  try {
+    history = JSON.parse(localStorage.getItem('atm_checkin_history') || '[]');
+  } catch(e) {}
+
+  const weekDaysLetters = ['S', 'T', 'Q', 'Q', 'S', 'S', 'D'];
+  const weekDates = getWeekDates();
+
+  const checkinByDate = {};
+  history.forEach(c => {
+    const d = c.data_formatada || (c.data ? new Date(c.data).toLocaleDateString('pt-BR') : '');
+    if (d) checkinByDate[d] = c;
+  });
+
+  let html = '';
+  weekDaysLetters.forEach((letter, i) => {
+    const dateStr = weekDates[i];
+    const checkin = checkinByDate[dateStr];
+
+    let height = '15%';
+    let fillClass = '';
+    if (checkin && checkin.dor_intensidade) {
+      const val = parseInt(checkin.dor_intensidade);
+      height = Math.max(25, val * 20) + '%';
+      if (val >= 4) fillClass = 'high';
+      else if (val >= 2) fillClass = 'mid';
+    }
+
+    html += `<div class="bar-col" title="${dateStr}">
+      <div class="bar-fill ${fillClass}" style="height:${height}; opacity: ${checkin ? '1' : '0.2'}"></div>
+      <div class="bar-day">${letter}</div>
+    </div>`;
+  });
+  chartEl.innerHTML = html;
+}
+
 function saveCheckin() {
   const userId = getUserId();
 
@@ -2537,6 +2656,10 @@ function saveCheckin() {
 
   // Atualiza card de check-in na tela inicial
   updateHomeCheckinUI(payload);
+
+  // Atualiza sequência e gráfico de rastreador
+  updateStreakUI();
+  updateTrackerUI();
 
   // Notifica o usuário e volta para a tela inicial
   showToast('Check-in salvo com sucesso! Obrigada por cuidar de você 💚');
@@ -2946,6 +3069,10 @@ function initApp() {
   }
 
   updateGreeting();
+
+  // Restore streak and tracker UI
+  updateStreakUI();
+  updateTrackerUI();
 
   // Restore last checkin
   try {
