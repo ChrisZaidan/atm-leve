@@ -623,13 +623,16 @@
     </div>
     <div class="export-buttons-group">
       <button class="btn-export" onclick="exportSPSS()">
-        <span>📊</span> Baixar Dataset (.CSV para SPSS / Jamovi)
+        <span>📊</span> Baixar Dataset (SPSS / Jamovi)
+      </button>
+      <button class="btn-export" style="background:#1D6F42;" onclick="exportExcel()">
+        <span>📗</span> Baixar Planilha (Excel Brasil)
       </button>
       <button class="btn-export secondary" onclick="openCodebook()">
-        <span>📖</span> Dicionário de Variáveis (Codebook)
+        <span>📖</span> Dicionário (Codebook)
       </button>
       <button class="btn-export secondary" onclick="generateExecutivePDF()">
-        <span>📑</span> Relatório Síntese CAPES (PDF)
+        <span>📑</span> Relatório Síntese (PDF)
       </button>
     </div>
   </section>
@@ -1025,15 +1028,62 @@ function exportSPSS() {
     csvRows.push(values.join(','));
   });
 
-  const csvContent = "data:text/csv;charset=utf-8,﻿" + encodeURIComponent(csvRows.join('\n'));
+  const blob = new Blob(["\uFEFF" + csvRows.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
   const downloadAnchor = document.createElement('a');
-  downloadAnchor.setAttribute('href', csvContent);
-  downloadAnchor.setAttribute('download', 'ATM_Leve_Dataset_SPSS_Jamovi_' + new Date().toISOString().slice(0,10) + '.csv');
+  downloadAnchor.href = url;
+  downloadAnchor.download = 'ATM_Leve_Dataset_SPSS_Jamovi_' + new Date().toISOString().slice(0,10) + '.csv';
   document.body.appendChild(downloadAnchor);
   downloadAnchor.click();
   document.body.removeChild(downloadAnchor);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 
-  setTimeout(() => showPortalToast('✓ Arquivo CSV exportado com sucesso!'), 800);
+  setTimeout(() => showPortalToast('✓ Arquivo CSV exportado com sucesso!'), 600);
+}
+
+function exportExcel() {
+  showPortalToast('Gerando Planilha para Excel Brasil (ponto e vírgula)...');
+
+  // Cabeçalhos em português legíveis diretamente no Excel
+  const headers = [
+    'ID Paciente', 'Idade', 'Sexo', 'Classificacao DC/TMD', 
+    'Dor Inicial (EVA)', 'Dor Atual (EVA)', 'Reducao da Dor (%)', 
+    'Qualidade Sono (1-5)', 'Nivel Estresse (1-5)', 'Total Check-ins', 
+    'Dias em Estudo', 'Termo TCLE'
+  ];
+
+  // Excel no Brasil usa ';' como separador de colunas
+  const csvRows = ['sep=;\r\n' + headers.join(';')];
+
+  cohortData.forEach(row => {
+    const values = [
+      row.id,
+      row.age,
+      row.sex === 'F' ? 'Feminino' : 'Masculino',
+      'DTM ' + row.classif,
+      row.initialVas.toFixed(1).replace('.', ','),
+      row.currentVas.toFixed(1).replace('.', ','),
+      row.delta.toFixed(1).replace('.', ',') + '%',
+      row.sleep.toFixed(1).replace('.', ','),
+      row.stress.toFixed(1).replace('.', ','),
+      row.checkins,
+      row.days,
+      row.tcle
+    ];
+    csvRows.push(values.join(';'));
+  });
+
+  const blob = new Blob(["\uFEFF" + csvRows.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const downloadAnchor = document.createElement('a');
+  downloadAnchor.href = url;
+  downloadAnchor.download = 'ATM_Leve_Planilha_Excel_' + new Date().toISOString().slice(0,10) + '.csv';
+  document.body.appendChild(downloadAnchor);
+  downloadAnchor.click();
+  document.body.removeChild(downloadAnchor);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+  setTimeout(() => showPortalToast('✓ Planilha Excel baixada com sucesso!'), 600);
 }
 
 function openCodebook() {
