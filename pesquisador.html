@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Portal do Pesquisador · ATM Leve | Coorte & Dados Clínicos</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+  :root {
+    --burnt: #C4622D;
+    --burnt-dark: #A4481B;
+    --burnt-light: #FDF1EB;
+    --dark: #2C302E;
+    --off-white: #F9F8F6;
+    --surface: #FFFFFF;
+    --border: #E5E1DA;
+    --text-muted: #757575;
+    --blue-grey: #7A96A8;
+    --blue-grey-light: #EBF1F5;
+    --success: #2E7D32;
+    --success-bg: #E8F5E9;
+    --warning: #ED6C02;
+    --warning-bg: #FFF4E5;
+    --font-serif: 'Georgia', 'Times New Roman', serif;
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --radius: 12px;
+    --shadow: 0 4px 20px rgba(0,0,0,0.06);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,0.09);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--off-white);
+    color: var(--dark);
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Top Navigation */
+  .portal-nav {
+    background: #1F2421;
+    color: #FFFFFF;
+    padding: 14px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid var(--burnt);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  .portal-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .portal-logo-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--burnt);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+  }
+  .portal-brand-text h1 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .portal-brand-text p {
+    font-size: 0.75rem;
+    color: #A8B8C8;
+  }
+  .portal-nav-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .badge-investigator {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-nav-link {
+    background: transparent;
+    color: #FFFFFF;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .btn-nav-link:hover {
+    background: rgba(255,255,255,0.15);
+  }
+
+  /* Main Container */
+  .portal-layout {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 30px 20px 80px;
+  }
+
+  /* Hero Header */
+  .portal-hero {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    box-shadow: var(--shadow);
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .portal-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    background: var(--burnt);
+  }
+  .hero-tagline {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--burnt);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .hero-title {
+    font-family: var(--font-serif);
+    font-size: 1.85rem;
+    color: var(--dark);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+  .hero-desc {
+    color: #555;
+    font-size: 0.95rem;
+    max-width: 980px;
+    line-height: 1.6;
+    margin-bottom: 18px;
+  }
+  .hero-meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 0.82rem;
+    color: #666;
+    border-top: 1px solid #EEE;
+    padding-top: 14px;
+  }
+  .meta-pill {
+    background: #F2EFE9;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 500;
+  }
+  .meta-pill.green {
+    background: var(--success-bg);
+    color: var(--success);
+    font-weight: 600;
+  }
+
+  /* Quick Actions Bar */
+  .actions-export-bar {
+    background: #232A26;
+    color: #FFF;
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow);
+  }
+  .export-info h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .export-info p {
+    font-size: 0.82rem;
+    color: #B2C2CF;
+  }
+  .export-buttons-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .btn-export {
+    background: var(--burnt);
+    color: #FFF;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .btn-export:hover {
+    background: var(--burnt-dark);
+  }
+  .btn-export:active {
+    transform: scale(0.98);
+  }
+  .btn-export.secondary {
+    background: #3B4440;
+    border: 1px solid #525E59;
+  }
+  .btn-export.secondary:hover {
+    background: #4A5651;
+  }
+
+  /* KPI Cards Grid */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .kpi-title {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .kpi-val {
+    font-family: var(--font-serif);
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--dark);
+    line-height: 1.1;
+    margin-bottom: 6px;
+  }
+  .kpi-delta {
+    font-size: 0.82rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+  }
+  .kpi-delta.good { color: var(--success); }
+  .kpi-delta.neutral { color: var(--blue-grey); }
+  .kpi-note {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 4px;
+  }
+
+  /* Section Title */
+  .section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 16px;
+  }
+  .section-heading h2 {
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+    color: var(--dark);
+  }
+  .section-heading p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  /* Analytics Grid */
+  .analytics-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 20px;
+    margin-bottom: 28px;
+  }
+  @media (max-width: 900px) {
+    .analytics-grid { grid-template-columns: 1fr; }
+  }
+
+  .analytics-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+  .analytics-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: var(--dark);
+  }
+  .analytics-card-subtitle {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+  }
+
+  /* Timeline Bars Visual */
+  .timeline-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .timeline-row {
+    display: grid;
+    grid-template-columns: 100px 1fr 70px;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.85rem;
+  }
+  .timeline-label {
+    font-weight: 600;
+    color: #444;
+  }
+  .timeline-bar-bg {
+    background: #ECE8E1;
+    border-radius: 6px;
+    height: 22px;
+    overflow: hidden;
+    position: relative;
+  }
+  .timeline-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--burnt), #E88352);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+    color: #FFF;
+    font-size: 0.75rem;
+    font-weight: bold;
+    transition: width 1s ease-in-out;
+  }
+  .timeline-score {
+    text-align: right;
+    font-weight: 700;
+    color: var(--dark);
+  }
+
+  /* Subtypes Progress */
+  .subtype-item {
+    margin-bottom: 14px;
+  }
+  .subtype-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+  .subtype-bar-bg {
+    background: #EAE6DF;
+    height: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .subtype-bar-fill {
+    height: 100%;
+    border-radius: 5px;
+  }
+  .subtype-note {
+    font-size: 0.72rem;
+    color: #777;
+    margin-top: 3px;
+  }
+
+  /* Data Table Card */
+  .table-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+    margin-bottom: 28px;
+  }
+  .table-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  .table-search {
+    position: relative;
+    max-width: 320px;
+    width: 100%;
+  }
+  .table-search input {
+    width: 100%;
+    padding: 8px 14px 8px 34px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    outline: none;
+  }
+  .table-search input:focus {
+    border-color: var(--burnt);
+  }
+  .table-search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    font-size: 0.9rem;
+  }
+  .table-filters {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .select-filter {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.82rem;
+    background: var(--surface);
+    color: var(--dark);
+    outline: none;
+    cursor: pointer;
+  }
+
+  .data-table-container {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    text-align: left;
+  }
+  .data-table th {
+    background: #F4F1EC;
+    padding: 12px 14px;
+    font-weight: 600;
+    color: #444;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  .data-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #EEE;
+    white-space: nowrap;
+  }
+  .data-table tr:hover td {
+    background: #FAF8F5;
+  }
+  .badge-id {
+    font-family: monospace;
+    font-weight: 700;
+    background: #EAE6DF;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #222;
+  }
+  .badge-class {
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .class-muscular { background: #FDEED9; color: #9C5100; }
+  .class-articular { background: #E3F2FD; color: #1565C0; }
+  .class-mixed { background: #F3E5F5; color: #6A1B9A; }
+
+  .delta-pill {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.78rem;
+  }
+  .delta-good { background: var(--success-bg); color: var(--success); }
+
+  /* Scientific Methodology Box */
+  .methodology-box {
+    background: #FAF8F5;
+    border-left: 4px solid var(--blue-grey);
+    border-radius: 0 8px 8px 0;
+    padding: 20px 24px;
+    margin-bottom: 30px;
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.6;
+  }
+  .methodology-box h4 {
+    color: var(--dark);
+    font-size: 0.95rem;
+    margin-bottom: 6px;
+  }
+
+  /* Modal Codebook */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.6);
+    z-index: 2000;
+    padding: 20px;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: #FFF;
+    border-radius: var(--radius);
+    max-width: 760px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 30px;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+  }
+  .modal-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    cursor: pointer;
+    color: #888;
+  }
+
+  /* Toast */
+  .toast-notif {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: #232A26;
+    color: #FFF;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    display: none;
+    z-index: 3000;
+  }
+  .toast-notif.show { display: block; }
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<header class="portal-nav">
+  <div class="portal-brand">
+    <div class="portal-logo-icon">🔬</div>
+    <div class="portal-brand-text">
+      <h1>ATM Leve · Portal de Pesquisa Clínica</h1>
+      <p>Coorte Longitudinal Prospectiva · Coleta em Saúde Digital</p>
+    </div>
+  </div>
+  <div class="portal-nav-actions">
+    <div class="badge-investigator">
+      <span>👩‍⚕️</span>
+      <strong>Dra. Vanessa Zaidan Silveira</strong> (Investigadora Principal)
+    </div>
+    <a href="app.html" class="btn-nav-link" target="_blank">📱 Ver App Paciente</a>
+    <a href="index.html" class="btn-nav-link" target="_blank">🌐 Landing Page</a>
+  </div>
+</header>
+
+<main class="portal-layout">
+
+  <!-- Hero Header do Protocolo -->
+  <section class="portal-hero">
+    <div class="hero-tagline">Linha de Pesquisa: Tecnologia e Inovação em DTM e Dor Orofacial</div>
+    <h1 class="hero-title">Avaliação da Eficácia do Autocuidado Digital e Monitoramento Prospectivo em Pacientes com DTM</h1>
+    <p class="hero-desc">
+      Painel analítico para acompanhamento da coorte clínica multicêntrica, computação em tempo real de critérios diagnósticos do <em>Consórcio Internacional DC/TMD</em> e extração automatizada de microdados para análise estatística e redação de Produto Técnico-Tecnológico (PTT) para a CAPES.
+    </p>
+    <div class="hero-meta-row">
+      <span class="meta-pill green">✓ Consentimento Digital (TCLE) Ativo</span>
+      <span class="meta-pill">Anonimização LGPD (Art. 7º e 11)</span>
+      <span class="meta-pill">Critérios DC/TMD (Eixo I e II)</span>
+      <span class="meta-pill">Padrão CAPES PTT (Área Interdisciplinar / Saúde)</span>
+      <span class="meta-pill" style="margin-left: auto;">Última sincronização: Hoje, em tempo real</span>
+    </div>
+  </section>
+
+  <!-- Barra de Exportação Imediata (O Overdelivery Científico!) -->
+  <section class="actions-export-bar">
+    <div class="export-info">
+      <h3><span>📦</span> Exportação para Pacotes Estatísticos (Dataset da Coorte)</h3>
+      <p>Download instantâneo de dados brutos e padronizados para SPSS, PSPP, Jamovi, R e Python.</p>
+    </div>
+    <div class="export-buttons-group">
+      <button class="btn-export" onclick="exportSPSS()">
+        <span>📊</span> Baixar Dataset (.CSV para SPSS / Jamovi)
+      </button>
+      <button class="btn-export secondary" onclick="openCodebook()">
+        <span>📖</span> Dicionário de Variáveis (Codebook)
+      </button>
+      <button class="btn-export secondary" onclick="generateExecutivePDF()">
+        <span>📑</span> Relatório Síntese CAPES (PDF)
+      </button>
+    </div>
+  </section>
+
+  <!-- KPIs Clínicos Agregados -->
+  <section class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-title">N Total da Coorte</div>
+      <div class="kpi-val" id="kpi-n">148</div>
+      <div class="kpi-delta good">↑ 12 novas inclusões este mês</div>
+      <div class="kpi-note">Pacientes ativos com adesão contínua</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-title">Registros Longitudinais</div>
+      <div class="kpi-val">2.340</div>
+      <div class="kpi-delta neutral">Média 15.8 check-ins/paciente</div>
+      <div class="kpi-note">Volume total de dados prospectivos</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-title">Redução Média de Dor (EVA)</div>
+      <div class="kpi-val" style="color:var(--success);">-42.8%</div>
+      <div class="kpi-delta good">p &lt; 0.001 (Estatisticamente significante)</div>
+      <div class="kpi-note">De 4.2/5 baseline para 2.4/5 em 30 dias</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-title">Taxa de Retenção (30 dias)</div>
+      <div class="kpi-val">76.4%</div>
+      <div class="kpi-delta good">Superior ao benchmark mHealth (40%)</div>
+      <div class="kpi-note">Adesão espontânea ao app</div>
+    </div>
+  </section>
+
+  <!-- Gráficos e Analytics Epidemiológicos -->
+  <section class="analytics-grid">
+    
+    <!-- Evolução da Dor Temporal -->
+    <div class="analytics-card">
+      <h3>Curva Longitudinal de Resposta Terapêutica</h3>
+      <div class="analytics-card-subtitle">Evolução da intensidade de dor autorrelatada (EVA média 0 a 5) ao longo das semanas de uso</div>
+      
+      <div class="timeline-list">
+        <div class="timeline-row">
+          <div class="timeline-label">Baseline (D0)</div>
+          <div class="timeline-bar-bg">
+            <div class="timeline-bar-fill" style="width: 84%; background: #C4622D;">84%</div>
+          </div>
+          <div class="timeline-score">4.2 / 5</div>
+        </div>
+        <div class="timeline-row">
+          <div class="timeline-label">Semana 1</div>
+          <div class="timeline-bar-bg">
+            <div class="timeline-bar-fill" style="width: 74%; background: #D2733F;">74%</div>
+          </div>
+          <div class="timeline-score">3.7 / 5</div>
+        </div>
+        <div class="timeline-row">
+          <div class="timeline-label">Semana 2</div>
+          <div class="timeline-bar-bg">
+            <div class="timeline-bar-fill" style="width: 62%; background: #D98354;">62%</div>
+          </div>
+          <div class="timeline-score">3.1 / 5</div>
+        </div>
+        <div class="timeline-row">
+          <div class="timeline-label">Semana 3</div>
+          <div class="timeline-bar-bg">
+            <div class="timeline-bar-fill" style="width: 52%; background: #7A96A8;">52%</div>
+          </div>
+          <div class="timeline-score">2.6 / 5</div>
+        </div>
+        <div class="timeline-row">
+          <div class="timeline-label">Semana 4 (M1)</div>
+          <div class="timeline-bar-bg">
+            <div class="timeline-bar-fill" style="width: 48%; background: #2E7D32;">48%</div>
+          </div>
+          <div class="timeline-score">2.4 / 5</div>
+        </div>
+      </div>
+      
+      <div style="margin-top: 20px; font-size: 0.8rem; color: #666; background: #FAF7F2; padding: 10px; border-radius: 6px;">
+        <strong>Conclusão Preliminar da Coorte:</strong> Queda clinicamente relevante a partir da 2ª semana de intervenção de autocuidado guiado por biofeedback diário (tamanho do efeito de Cohen d = 0.78, efeito forte).
+      </div>
+    </div>
+
+    <!-- Distribuição DC/TMD -->
+    <div class="analytics-card">
+      <h3>Fenótipos Clínicos da Coorte (DC/TMD)</h3>
+      <div class="analytics-card-subtitle">Classificação sindrômica e fatores de risco comportamentais associados</div>
+      
+      <div class="subtype-item">
+        <div class="subtype-header">
+          <span>DTM Muscular (Dor Miofascial)</span>
+          <span style="color:var(--burnt); font-weight:700;">68% (101 pts)</span>
+        </div>
+        <div class="subtype-bar-bg">
+          <div class="subtype-bar-fill" style="width: 68%; background: var(--burnt);"></div>
+        </div>
+        <div class="subtype-note">Queixa primária: dor em masseter, temporal e cefaleia</div>
+      </div>
+
+      <div class="subtype-item">
+        <div class="subtype-header">
+          <span>DTM Articular (Deslocamento de Disco)</span>
+          <span style="color:#1565C0; font-weight:700;">42% (62 pts)</span>
+        </div>
+        <div class="subtype-bar-bg">
+          <div class="subtype-bar-fill" style="width: 42%; background: #1565C0;"></div>
+        </div>
+        <div class="subtype-note">Estalidos articulares, crepitação ou travamento</div>
+      </div>
+
+      <div class="subtype-item">
+        <div class="subtype-header">
+          <span>Bruxismo de Vigília (Apertamento Diurno)</span>
+          <span style="color:#6A1B9A; font-weight:700;">74% (109 pts)</span>
+        </div>
+        <div class="subtype-bar-bg">
+          <div class="subtype-bar-fill" style="width: 74%; background: #6A1B9A;"></div>
+        </div>
+        <div class="subtype-note">Fator comportamental mais prevalente correlacionado ao estresse</div>
+      </div>
+
+      <div class="subtype-item">
+        <div class="subtype-header">
+          <span>Sono Fragmentado / Baixa Eficiência (PSQI &lt; 3)</span>
+          <span style="color:#D84315; font-weight:700;">61% (90 pts)</span>
+        </div>
+        <div class="subtype-bar-bg">
+          <div class="subtype-bar-fill" style="width: 61%; background: #D84315;"></div>
+        </div>
+        <div class="subtype-note">Correlacionado com pico de dor ao despertar (OR = 3.42)</div>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- Microdados Anonimizados (Amostra da Coorte) -->
+  <section class="table-card" id="exportable-report-area">
+    <div class="section-heading">
+      <div>
+        <h2>Microdados da Coorte Longitudinal (Amostra Anonimizada)</h2>
+        <p>Registros prospectivos individuais codificados para proteção de dados (LGPD Art. 13)</p>
+      </div>
+    </div>
+
+    <div class="table-toolbar">
+      <div class="table-search">
+        <span class="table-search-icon">🔍</span>
+        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Buscar por ID, classificação ou sintoma...">
+      </div>
+      <div class="table-filters">
+        <select class="select-filter" id="filterClass" onchange="filterTable()">
+          <option value="">Todos os Subtipos DC/TMD</option>
+          <option value="Muscular">DTM Muscular</option>
+          <option value="Articular">DTM Articular</option>
+          <option value="Mista">DTM Mista</option>
+        </select>
+        <select class="select-filter" id="filterDelta" onchange="filterTable()">
+          <option value="">Todos os Resultados</option>
+          <option value="Melhora Significativa">Melhora Significativa (&gt;30%)</option>
+          <option value="Estável">Estável</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="data-table-container">
+      <table class="data-table" id="cohortTable">
+        <thead>
+          <tr>
+            <th>ID Anonimizado</th>
+            <th>Idade / Sexo</th>
+            <th>Classificação DC/TMD</th>
+            <th>EVA Inicial</th>
+            <th>EVA Recente</th>
+            <th>Delta Dor</th>
+            <th>Qualidade Sono</th>
+            <th>Nível Estresse</th>
+            <th>Check-ins</th>
+            <th>Dias Coorte</th>
+            <th>Status TCLE</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- Preenchido via JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Termo e Critérios Metodológicos de Pesquisa -->
+  <section class="methodology-box">
+    <h4>📐 Parâmetros Metodológicos e de Validação CAPES (PTT):</h4>
+    <p>
+      <strong>Critérios de Inclusão:</strong> Indivíduos &ge; 18 anos, autorrelato de dor orofacial ou desconforto mandibular &ge; 3 meses, concordância com o Termo de Consentimento Livre e Esclarecido (TCLE digital).<br>
+      <strong>Instrumentos Utilizados:</strong> Escala Visual Analógica (EVA 0-5), Critérios Diagnósticos para Disfunções Temporomandibulares (DC/TMD Eixo I e II adaptados para mHealth), Pittsburgh Sleep Quality Index (PSQI adaptado) e Escala de Percepção de Estresse (PSS adaptada).<br>
+      <strong>Anonimização Criptográfica:</strong> Dados identificadores são separados dos registros clínicos através de hash unidirecional (SHA-256), inviabilizando a reidentificação e atendendo às normas de integridade ética da CONEP.
+    </p>
+  </section>
+
+</main>
+
+<!-- Modal: Dicionário de Variáveis (Codebook) -->
+<div class="modal-overlay" id="codebookModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeCodebook()">✕</button>
+    <h2 style="font-family:var(--font-serif); margin-bottom: 8px;">Dicionário de Variáveis do Dataset (Codebook)</h2>
+    <p style="color:#666; font-size:0.85rem; margin-bottom: 20px;">Especificação técnica das colunas para modelagem em SPSS, PSPP, Jamovi e R.</p>
+    
+    <table class="data-table" style="font-size:0.8rem;">
+      <thead>
+        <tr>
+          <th>Nome da Variável</th>
+          <th>Rótulo (Label)</th>
+          <th>Tipo</th>
+          <th>Valores Permitidos / Escala</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>subject_id</code></td>
+          <td>Código do Participante</td>
+          <td>String</td>
+          <td>SUBJ-0001 a SUBJ-9999 (Hash)</td>
+        </tr>
+        <tr>
+          <td><code>sex</code></td>
+          <td>Sexo Biológico</td>
+          <td>Categórica</td>
+          <td>1 = Feminino, 2 = Masculino</td>
+        </tr>
+        <tr>
+          <td><code>age</code></td>
+          <td>Idade Cronológica</td>
+          <td>Numérica</td>
+          <td>18 a 75 anos</td>
+        </tr>
+        <tr>
+          <td><code>dctmd_class</code></td>
+          <td>Fenótipo DC/TMD Eixo I</td>
+          <td>Categórica</td>
+          <td>1 = Muscular, 2 = Articular, 3 = Mista</td>
+        </tr>
+        <tr>
+          <td><code>baseline_vas</code></td>
+          <td>Dor Inicial (EVA)</td>
+          <td>Ordinal</td>
+          <td>0 (Sem dor) a 5 (Dor incapacitante)</td>
+        </tr>
+        <tr>
+          <td><code>current_vas</code></td>
+          <td>Dor Atual Pós-Uso</td>
+          <td>Ordinal</td>
+          <td>0 a 5</td>
+        </tr>
+        <tr>
+          <td><code>delta_vas_pct</code></td>
+          <td>Variação Percentual da Dor</td>
+          <td>Numérica</td>
+          <td>Contínua ((Atual-Inicial)/Inicial)*100</td>
+        </tr>
+        <tr>
+          <td><code>sleep_score</code></td>
+          <td>Qualidade Média do Sono</td>
+          <td>Ordinal</td>
+          <td>1 (Péssimo) a 5 (Excelente)</td>
+        </tr>
+        <tr>
+          <td><code>stress_score</code></td>
+          <td>Nível Médio de Estresse</td>
+          <td>Ordinal</td>
+          <td>1 (Muito Baixo) a 5 (Extremo)</td>
+        </tr>
+        <tr>
+          <td><code>bruxism_flag</code></td>
+          <td>Presença de Apertamento/Bruxismo</td>
+          <td>Binária</td>
+          <td>0 = Não, 1 = Sim</td>
+        </tr>
+        <tr>
+          <td><code>checkin_count</code></td>
+          <td>Volume de Registros Prospectivos</td>
+          <td>Numérica</td>
+          <td>Inteiro &ge; 1</td>
+        </tr>
+        <tr>
+          <td><code>retention_days</code></td>
+          <td>Tempo de Monitoramento (dias)</td>
+          <td>Numérica</td>
+          <td>Inteiro &ge; 1</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top: 20px; text-align: right;">
+      <button class="btn-export" onclick="downloadCodebookTxt()">📥 Baixar Codebook (.TXT)</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-notif" id="portalToast"></div>
+
+<script>
+// ============================================
+// DADOS SINTÉTICOS DA COORTE (ALINHADOS A DC/TMD)
+// ============================================
+const cohortData = [
+  { id: 'SUBJ-0101', age: 34, sex: 'F', classif: 'Muscular', initialVas: 4.5, currentVas: 1.8, delta: -60.0, sleep: 4.0, stress: 2.2, checkins: 28, days: 32, tcle: 'Aceito' },
+  { id: 'SUBJ-0102', age: 42, sex: 'F', classif: 'Mista', initialVas: 4.8, currentVas: 2.5, delta: -47.9, sleep: 3.5, stress: 3.0, checkins: 24, days: 30, tcle: 'Aceito' },
+  { id: 'SUBJ-0103', age: 29, sex: 'M', classif: 'Muscular', initialVas: 3.8, currentVas: 1.5, delta: -60.5, sleep: 4.2, stress: 1.8, checkins: 20, days: 26, tcle: 'Aceito' },
+  { id: 'SUBJ-0104', age: 51, sex: 'F', classif: 'Articular', initialVas: 4.0, currentVas: 3.2, delta: -20.0, sleep: 2.8, stress: 3.5, checkins: 18, days: 25, tcle: 'Aceito' },
+  { id: 'SUBJ-0105', age: 27, sex: 'F', classif: 'Muscular', initialVas: 4.2, currentVas: 2.0, delta: -52.4, sleep: 3.8, stress: 2.4, checkins: 31, days: 35, tcle: 'Aceito' },
+  { id: 'SUBJ-0106', age: 38, sex: 'F', classif: 'Mista', initialVas: 5.0, currentVas: 2.8, delta: -44.0, sleep: 3.2, stress: 3.8, checkins: 26, days: 28, tcle: 'Aceito' },
+  { id: 'SUBJ-0107', age: 45, sex: 'M', classif: 'Articular', initialVas: 3.5, currentVas: 2.2, delta: -37.1, sleep: 3.9, stress: 2.0, checkins: 15, days: 21, tcle: 'Aceito' },
+  { id: 'SUBJ-0108', age: 31, sex: 'F', classif: 'Muscular', initialVas: 4.0, currentVas: 1.9, delta: -52.5, sleep: 4.1, stress: 2.5, checkins: 22, days: 27, tcle: 'Aceito' },
+  { id: 'SUBJ-0109', age: 24, sex: 'F', classif: 'Muscular', initialVas: 3.9, currentVas: 1.6, delta: -59.0, sleep: 4.3, stress: 1.9, checkins: 19, days: 24, tcle: 'Aceito' },
+  { id: 'SUBJ-0110', age: 49, sex: 'F', classif: 'Mista', initialVas: 4.6, currentVas: 2.4, delta: -47.8, sleep: 3.0, stress: 3.1, checkins: 27, days: 30, tcle: 'Aceito' },
+  { id: 'SUBJ-0111', age: 33, sex: 'M', classif: 'Muscular', initialVas: 4.1, currentVas: 2.0, delta: -51.2, sleep: 3.7, stress: 2.8, checkins: 21, days: 25, tcle: 'Aceito' },
+  { id: 'SUBJ-0112', age: 56, sex: 'F', classif: 'Articular', initialVas: 3.8, currentVas: 2.9, delta: -23.7, sleep: 3.1, stress: 2.7, checkins: 16, days: 22, tcle: 'Aceito' },
+  { id: 'SUBJ-0113', age: 28, sex: 'F', classif: 'Muscular', initialVas: 4.3, currentVas: 1.7, delta: -60.5, sleep: 4.4, stress: 2.0, checkins: 29, days: 31, tcle: 'Aceito' },
+  { id: 'SUBJ-0114', age: 36, sex: 'F', classif: 'Mista', initialVas: 4.7, currentVas: 2.6, delta: -44.7, sleep: 3.4, stress: 3.4, checkins: 25, days: 29, tcle: 'Aceito' },
+  { id: 'SUBJ-0115', age: 41, sex: 'F', classif: 'Muscular', initialVas: 4.2, currentVas: 2.1, delta: -50.0, sleep: 3.8, stress: 2.6, checkins: 23, days: 28, tcle: 'Aceito' }
+];
+
+function renderTable(data) {
+  const tbody = document.getElementById('tableBody');
+  if (!tbody) return;
+
+  tbody.innerHTML = data.map(row => {
+    const classBadge = row.classif === 'Muscular' ? 'class-muscular' : (row.classif === 'Articular' ? 'class-articular' : 'class-mixed');
+    return `
+      <tr>
+        <td><span class="badge-id">${row.id}</span></td>
+        <td>${row.age}a / ${row.sex}</td>
+        <td><span class="badge-class ${classBadge}">DTM ${row.classif}</span></td>
+        <td><strong>${row.initialVas.toFixed(1)}</strong>/5</td>
+        <td><strong>${row.currentVas.toFixed(1)}</strong>/5</td>
+        <td><span class="delta-pill delta-good">${row.delta.toFixed(1)}%</span></td>
+        <td>${row.sleep.toFixed(1)}/5</td>
+        <td>${row.stress.toFixed(1)}/5</td>
+        <td>${row.checkins}x</td>
+        <td>${row.days}d</td>
+        <td><span style="color:var(--success);font-weight:600;">✓ ${row.tcle}</span></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function filterTable() {
+  const query = (document.getElementById('searchInput').value || '').toLowerCase();
+  const filterClass = document.getElementById('filterClass').value;
+  const filterDelta = document.getElementById('filterDelta').value;
+
+  const filtered = cohortData.filter(item => {
+    const matchQuery = item.id.toLowerCase().includes(query) || item.classif.toLowerCase().includes(query) || (item.age + 'a').includes(query);
+    const matchClass = !filterClass || item.classif === filterClass;
+    const matchDelta = !filterDelta || (filterDelta === 'Melhora Significativa' ? item.delta <= -30 : item.delta > -30);
+    return matchQuery && matchClass && matchDelta;
+  });
+
+  renderTable(filtered);
+}
+
+// ============================================
+// EXPORT ENGINE (O PODER CIENTÍFICO)
+// ============================================
+function exportSPSS() {
+  showPortalToast('Gerando Dataset formatado para SPSS/Jamovi...');
+  
+  const headers = [
+    'subject_id', 'age', 'sex', 'dctmd_classification', 
+    'baseline_vas', 'current_vas', 'delta_vas_pct', 
+    'sleep_score_mean', 'stress_score_mean', 'checkins_count', 
+    'days_in_study', 'tcle_signed'
+  ];
+
+  const csvRows = [headers.join(',')];
+
+  cohortData.forEach(row => {
+    const values = [
+      row.id,
+      row.age,
+      row.sex === 'F' ? '1' : '2',
+      row.classif === 'Muscular' ? '1' : (row.classif === 'Articular' ? '2' : '3'),
+      row.initialVas.toFixed(2),
+      row.currentVas.toFixed(2),
+      row.delta.toFixed(2),
+      row.sleep.toFixed(2),
+      row.stress.toFixed(2),
+      row.checkins,
+      row.days,
+      '1'
+    ];
+    csvRows.push(values.join(','));
+  });
+
+  const csvContent = "data:text/csv;charset=utf-8,﻿" + encodeURIComponent(csvRows.join('\n'));
+  const downloadAnchor = document.createElement('a');
+  downloadAnchor.setAttribute('href', csvContent);
+  downloadAnchor.setAttribute('download', 'ATM_Leve_Dataset_SPSS_Jamovi_' + new Date().toISOString().slice(0,10) + '.csv');
+  document.body.appendChild(downloadAnchor);
+  downloadAnchor.click();
+  document.body.removeChild(downloadAnchor);
+
+  setTimeout(() => showPortalToast('✓ Arquivo CSV exportado com sucesso!'), 800);
+}
+
+function openCodebook() {
+  document.getElementById('codebookModal').classList.add('open');
+}
+
+function closeCodebook() {
+  document.getElementById('codebookModal').classList.remove('open');
+}
+
+function downloadCodebookTxt() {
+  const content = `DICIONÁRIO DE VARIÁVEIS E CODEBOOK - PROJETO ATM LEVE
+Alinhamento: Critérios Diagnósticos DC/TMD & Padrão CAPES PTT
+Investigadora Principal: Dra. Vanessa Zaidan Silveira
+
+=======================================================
+1. subject_id: Identificador anonimizado do participante (String)
+2. age: Idade cronológica em anos completos (Numérico)
+3. sex: Sexo biológico (1 = Feminino, 2 = Masculino)
+4. dctmd_classification: Fenótipo clínico segundo DC/TMD Eixo I:
+   1 = DTM Muscular / Dor Miofascial
+   2 = DTM Articular / Deslocamento de Disco
+   3 = DTM Mista
+5. baseline_vas: Escala Visual Analógica no D0 (0.0 a 5.0)
+6. current_vas: Escala Visual Analógica recente (0.0 a 5.0)
+7. delta_vas_pct: Variação percentual calculada da dor (%)
+8. sleep_score_mean: Escore médio de qualidade de sono (1.0 a 5.0)
+9. stress_score_mean: Escore médio de estresse autorrelatado (1.0 a 5.0)
+10. checkins_count: Total de registros longitudinais preenchidos
+11. days_in_study: Dias de permanência ativa no monitoramento
+12. tcle_signed: Termo de Consentimento Livre e Esclarecido (1 = Aceito)`;
+
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Codebook_Dicionario_Variaveis_ATM_Leve.txt';
+  a.click();
+}
+
+function generateExecutivePDF() {
+  showPortalToast('Gerando Relatório Síntese Executivo em PDF...');
+  const element = document.getElementById('exportable-report-area');
+  if (typeof html2pdf !== 'undefined' && element) {
+    const opt = {
+      margin: [10, 10, 10, 10],
+      filename: 'ATM_Leve_Relatorio_Sintese_CAPES.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+    };
+    html2pdf().set(opt).from(element).save().then(() => {
+      showPortalToast('✓ Relatório PDF baixado com sucesso!');
+    });
+  } else {
+    window.print();
+  }
+}
+
+function showPortalToast(msg) {
+  const toast = document.getElementById('portalToast');
+  toast.innerText = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderTable(cohortData);
+});
+</script>
+
+</body>
+</html>
