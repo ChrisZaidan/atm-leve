@@ -1423,6 +1423,238 @@
     #app {
       min-height: 100vh;
       box-shadow: 0 0 60px rgba(0,0,0,0.15);
+  /* =========================================
+     RELATÓRIO CLÍNICO (DOSSIÊ DO PACIENTE)
+  ========================================= */
+  .report-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(30, 30, 30, 0.85);
+    z-index: 9999;
+    overflow-y: auto;
+    padding: 20px 16px;
+    align-items: flex-start;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .report-overlay.open {
+    display: flex;
+  }
+  .report-container {
+    max-width: 760px;
+    width: 100%;
+    margin: 20px auto 60px;
+  }
+  .report-actions-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    justify-content: flex-end;
+  }
+  .btn-print {
+    background: var(--burnt);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(196, 98, 45, 0.3);
+  }
+  .btn-close-report {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+  }
+  .report-paper {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 40px 36px;
+    color: #2b2b2b;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    line-height: 1.5;
+  }
+  .rep-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2px solid #C4622D;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+    gap: 16px;
+  }
+  .rep-logo-title {
+    font-family: 'Georgia', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #2b2b2b;
+  }
+  .rep-logo-sub {
+    font-size: 0.78rem;
+    color: #666;
+    margin-top: 3px;
+  }
+  .rep-doc-meta {
+    text-align: right;
+    font-size: 0.75rem;
+    color: #555;
+    line-height: 1.4;
+  }
+  .rep-patient-bar {
+    background: #F7F5F2;
+    border: 1px solid #E8E4DF;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: space-between;
+  }
+  .rep-patient-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #888;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .rep-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .rep-metric-card {
+    background: #FAF8F5;
+    border: 1px solid #EAE6E1;
+    border-radius: 8px;
+    padding: 12px 14px;
+    text-align: center;
+  }
+  .rep-metric-val {
+    font-family: 'Georgia', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #C4622D;
+    margin-top: 4px;
+  }
+  .rep-metric-sub {
+    font-size: 0.75rem;
+    color: #777;
+    margin-top: 2px;
+  }
+  .rep-section-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #2b2b2b;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 6px;
+    margin: 20px 0 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .rep-tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 18px;
+  }
+  .rep-tag {
+    font-size: 0.78rem;
+    padding: 4px 10px;
+    border-radius: 14px;
+    background: #F0EDE8;
+    color: #444;
+  }
+  .rep-tag.highlight {
+    background: #FDF1EB;
+    color: #C4622D;
+    font-weight: 600;
+  }
+  .rep-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78rem;
+    margin-bottom: 24px;
+  }
+  .rep-table th {
+    background: #F7F5F2;
+    padding: 8px 10px;
+    text-align: left;
+    font-weight: 600;
+    color: #555;
+    border-bottom: 1px solid #ddd;
+  }
+  .rep-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+  }
+  .rep-footer-disclaimer {
+    font-size: 0.7rem;
+    color: #888;
+    line-height: 1.45;
+    margin-top: 24px;
+    border-top: 1px solid #eee;
+    padding-top: 14px;
+  }
+  .rep-sign-area {
+    margin-top: 36px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-top: 10px;
+  }
+  .rep-sign-box {
+    width: 220px;
+    border-top: 1px solid #444;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #444;
+    padding-top: 4px;
+  }
+
+  /* Impressão direta */
+  @media print {
+    body, html {
+      background: #fff !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+    #app, .bottom-nav, .nav, .toast, .report-actions-bar {
+      display: none !important;
+    }
+    .report-overlay {
+      display: block !important;
+      position: static !important;
+      padding: 0 !important;
+      background: transparent !important;
+      width: 100% !important;
+      height: auto !important;
+    }
+    .report-container {
+      max-width: 100% !important;
+      margin: 0 !important;
+    }
+    .report-paper {
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      padding: 0 !important;
+    }
+    @page {
+      margin: 1.2cm;
+      size: A4 portrait;
     }
   }
 </style>
@@ -2237,6 +2469,19 @@
         </div>
       </div>
 
+      <!-- Dossiê / Relatório Clínico para Consulta -->
+      <div class="card mt-16" style="border-left: 4px solid var(--burnt); background: #FAF8F5;">
+        <div class="card-label" style="color:var(--burnt); font-weight:700;">Dossiê do Paciente</div>
+        <div class="card-title" style="font-size:1.05rem; margin-bottom:6px;">Relatório Clínico Longitudinal</div>
+        <div class="card-desc" style="font-size:0.85rem; margin-bottom:14px; line-height:1.5;">
+          Gere um prontuário com o histórico das suas dores, sono, sintomas e gatilhos para levar à consulta com a Dra. Vanessa ou enviar pelo WhatsApp.
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <button class="btn-primary" style="padding:12px; font-size:0.9rem;" onclick="openClinicalReport()">📄 Visualizar / Salvar Relatório em PDF</button>
+          <button class="btn-card-outline" style="border-color:var(--burnt); color:var(--burnt); padding:10px; font-size:0.85rem;" onclick="shareReportWhatsApp()">📲 Enviar Resumo para a Dra. Vanessa</button>
+        </div>
+      </div>
+
       <div class="disclaimer-box mt-16">
         <strong>Aviso importante:</strong> O ATM Leve é uma ferramenta de educação em saúde, autocuidado e acompanhamento de sintomas. Não substitui consulta, diagnóstico ou tratamento com profissional de saúde habilitado. Em caso de dor intensa, travamento persistente, trauma, febre, inchaço, dormência ou piora súbita, procure atendimento profissional imediatamente.
       </div>
@@ -2274,6 +2519,21 @@
     <div class="modal-sheet">
       <div class="modal-handle"></div>
       <div class="modal-inner" id="edu-modal-content"></div>
+    </div>
+  </div>
+
+  <!-- ======================================
+       MODAL: Relatório Clínico Longitudinal
+  ======================================= -->
+  <div class="report-overlay" id="report-modal">
+    <div class="report-container">
+      <div class="report-actions-bar">
+        <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Salvar em PDF</button>
+        <button class="btn-close-report" onclick="closeClinicalReport()">✕ Fechar</button>
+      </div>
+      <div class="report-paper" id="report-printable-area">
+        <!-- Preenchido via JavaScript -->
+      </div>
     </div>
   </div>
 
@@ -2664,6 +2924,261 @@ function saveCheckin() {
   // Notifica o usuário e volta para a tela inicial
   showToast('Check-in salvo com sucesso! Obrigada por cuidar de você 💚');
   setTimeout(() => goTo('screen-home'), 1400);
+}
+
+// ============================================
+// RELATÓRIO CLÍNICO (DOSSIÊ DO PACIENTE)
+// ============================================
+function closeClinicalReport() {
+  const modal = document.getElementById('report-modal');
+  if (modal) modal.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function shareReportWhatsApp() {
+  const name = state.userName || localStorage.getItem('atm_user_name') || 'Paciente';
+  let history = [];
+  try {
+    history = JSON.parse(localStorage.getItem('atm_checkin_history') || '[]');
+  } catch(e) {}
+
+  if (history.length === 0) {
+    const last = localStorage.getItem('atm_last_checkin');
+    if (last) try { history = [JSON.parse(last)]; } catch(e) {}
+  }
+
+  const total = history.length;
+  if (total === 0) {
+    showToast('Realize pelo menos um check-in antes de compartilhar o resumo 😊');
+    return;
+  }
+
+  let sumDor = 0, sumSono = 0, sumEstresse = 0;
+  const sintomaCount = {}, gatilhoCount = {};
+
+  history.forEach(c => {
+    if (c.dor_intensidade) sumDor += parseInt(c.dor_intensidade);
+    if (c.qualidade_sono) sumSono += parseInt(c.qualidade_sono);
+    if (c.nivel_estresse) sumEstresse += parseInt(c.nivel_estresse);
+    (c.sintomas || []).forEach(s => sintomaCount[s] = (sintomaCount[s] || 0) + 1);
+    (c.gatilhos || []).forEach(g => gatilhoCount[g] = (gatilhoCount[g] || 0) + 1);
+  });
+
+  const mediaDor = (sumDor / total).toFixed(1);
+  const mediaSono = (sumSono / total).toFixed(1);
+  const mediaEstresse = (sumEstresse / total).toFixed(1);
+
+  const topSintomas = Object.entries(sintomaCount).sort((a,b)=>b[1]-a[1]).slice(0, 3).map(e=>e[0]).join(', ') || 'Nenhum relevante';
+  const topGatilhos = Object.entries(gatilhoCount).sort((a,b)=>b[1]-a[1]).slice(0, 3).map(e=>e[0]).join(', ') || 'Não informados';
+
+  const msg = `Olá, Dra. Vanessa! Segue o resumo do meu monitoramento pelo ATM Leve:\n\n` +
+    `👤 Paciente: ${name}\n` +
+    `📊 Total de check-ins: ${total}\n` +
+    `⚡ Média de desconforto/tensão: ${mediaDor}/5\n` +
+    `😴 Qualidade média do sono: ${mediaSono}/5\n` +
+    `🧠 Nível médio de estresse: ${mediaEstresse}/5\n` +
+    `🔍 Sintomas frequentes: ${topSintomas}\n` +
+    `☕ Gatilhos frequentes: ${topGatilhos}\n\n` +
+    `Gostaria de apresentar este dossiê na minha próxima consulta!`;
+
+  window.open(`https://wa.me/5532998513101?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+function openClinicalReport() {
+  const name = state.userName || localStorage.getItem('atm_user_name') || 'Paciente';
+  let history = [];
+  try {
+    history = JSON.parse(localStorage.getItem('atm_checkin_history') || '[]');
+  } catch(e) {}
+
+  if (history.length === 0) {
+    const last = localStorage.getItem('atm_last_checkin');
+    if (last) try { history = [JSON.parse(last)]; } catch(e) {}
+  }
+
+  const now = new Date();
+  const dataEmissao = now.toLocaleDateString('pt-BR') + ' às ' + now.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+  const printableArea = document.getElementById('report-printable-area');
+  if (!printableArea) return;
+
+  if (history.length === 0) {
+    printableArea.innerHTML = `
+      <div style="text-align:center; padding: 40px 20px;">
+        <div style="font-size:3rem;margin-bottom:12px;">📋</div>
+        <h2 style="font-family:'Georgia',serif;color:var(--dark);margin-bottom:8px;">Nenhum check-in registrado ainda</h2>
+        <p style="color:#666;font-size:0.9rem;max-width:420px;margin:0 auto 20px;line-height:1.5;">
+          Olá, <strong>${name}</strong>! Faça pelo menos um check-in diário no aplicativo para que seu histórico de sintomas, dor e sono apareça aqui formatado como prontuário clínico.
+        </p>
+        <button class="btn-primary" onclick="closeClinicalReport(); goTo('screen-checkin');">Fazer meu primeiro check-in agora →</button>
+      </div>
+    `;
+    document.getElementById('report-modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    return;
+  }
+
+  const total = history.length;
+  let sumDor = 0, sumSono = 0, sumEstresse = 0;
+  const sintomaCount = {}, gatilhoCount = {};
+
+  history.forEach(c => {
+    if (c.dor_intensidade) sumDor += parseInt(c.dor_intensidade);
+    if (c.qualidade_sono) sumSono += parseInt(c.qualidade_sono);
+    if (c.nivel_estresse) sumEstresse += parseInt(c.nivel_estresse);
+    (c.sintomas || []).forEach(s => sintomaCount[s] = (sintomaCount[s] || 0) + 1);
+    (c.gatilhos || []).forEach(g => gatilhoCount[g] = (gatilhoCount[g] || 0) + 1);
+  });
+
+  const mediaDor = (sumDor / total).toFixed(1);
+  const mediaSono = (sumSono / total).toFixed(1);
+  const mediaEstresse = (sumEstresse / total).toFixed(1);
+
+  const dorClass = mediaDor >= 3.5 ? 'Tensão Elevada / Dor Intensa' : (mediaDor >= 2 ? 'Desconforto Moderado' : 'Tensão Leve / Controlada');
+  const sonoClass = mediaSono >= 3.5 ? 'Sono Reparador' : (mediaSono >= 2.5 ? 'Sono Regular' : 'Sono Insuficiente / Agitado');
+  const estresseClass = mediaEstresse >= 3.5 ? 'Estresse Elevado' : (mediaEstresse >= 2.5 ? 'Estresse Moderado' : 'Estresse Baixo');
+
+  const primeiroRegistro = history[0].data_formatada || (history[0].data ? new Date(history[0].data).toLocaleDateString('pt-BR') : 'Início');
+  const ultimoRegistro = history[history.length - 1].data_formatada || (history[history.length - 1].data ? new Date(history[history.length - 1].data).toLocaleDateString('pt-BR') : 'Hoje');
+
+  const sortedSintomas = Object.entries(sintomaCount).sort((a,b)=>b[1]-a[1]);
+  const sortedGatilhos = Object.entries(gatilhoCount).sort((a,b)=>b[1]-a[1]);
+
+  // Monta tabela dos últimos registros (máx 8 registros mais recentes)
+  const recentRecords = [...history].reverse().slice(0, 8);
+  let rowsHtml = '';
+  recentRecords.forEach(r => {
+    const dataR = r.data_formatada || (r.data ? new Date(r.data).toLocaleDateString('pt-BR') : '—');
+    const dorR = r.dor_intensidade ? `${r.dor_intensidade}/5` : '—';
+    const sonoR = r.qualidade_sono ? `${r.qualidade_sono}/5` : '—';
+    const estresseR = r.nivel_estresse ? `${r.nivel_estresse}/5` : '—';
+    const sintR = (r.sintomas && r.sintomas.length) ? r.sintomas.slice(0, 2).join(', ') : 'Sem sintomas graves';
+    const obsR = r.observacoes ? r.observacoes : '—';
+
+    rowsHtml += `
+      <tr>
+        <td><strong>${dataR}</strong></td>
+        <td style="color:#C4622D;font-weight:600;">${dorR}</td>
+        <td>${sonoR}</td>
+        <td>${estresseR}</td>
+        <td>${sintR}</td>
+        <td style="color:#666;font-style:italic;">${obsR}</td>
+      </tr>
+    `;
+  });
+
+  printableArea.innerHTML = `
+    <!-- Cabeçalho Institucional Médico -->
+    <div class="rep-header">
+      <div>
+        <div class="rep-logo-title">ATM Leve</div>
+        <div class="rep-logo-sub">Dossiê de Monitoramento Longitudinal & Sintomas de DTM</div>
+        <div style="font-size:0.72rem;color:#C4622D;font-weight:600;margin-top:2px;">
+          Projeto de Pesquisa e Inovação em Saúde — Faculdade de Medicina da UFJF
+        </div>
+      </div>
+      <div class="rep-doc-meta">
+        <div><strong>Dra. Vanessa Zaidan Silveira</strong></div>
+        <div>Cirurgiã Bucomaxilofacial</div>
+        <div>Especialista em DTM e Dor Orofacial</div>
+        <div>Criadora do Método Rearticular™</div>
+        <div style="margin-top:4px;color:#888;">Emissão: ${dataEmissao}</div>
+      </div>
+    </div>
+
+    <!-- Barra de Identificação da Paciente -->
+    <div class="rep-patient-bar">
+      <div class="rep-patient-item">
+        <div class="rep-patient-label">Paciente</div>
+        <div style="font-weight:700;font-size:1rem;color:#2b2b2b;">${name}</div>
+      </div>
+      <div class="rep-patient-item">
+        <div class="rep-patient-label">Período de Monitoramento</div>
+        <div style="font-weight:600;color:#444;">${primeiroRegistro} até ${ultimoRegistro}</div>
+      </div>
+      <div class="rep-patient-item">
+        <div class="rep-patient-label">Total de Avaliações</div>
+        <div style="font-weight:700;color:#C4622D;">${total} check-in(s) concluído(s)</div>
+      </div>
+      <div class="rep-patient-item">
+        <div class="rep-patient-label">Critérios de Triagem</div>
+        <div style="font-weight:600;color:#444;">Padrão Internacional DC/TMD</div>
+      </div>
+    </div>
+
+    <!-- Indicadores Clínicos Principais -->
+    <div class="rep-metrics-grid">
+      <div class="rep-metric-card">
+        <div class="rep-patient-label">Nível de Dor / Tensão</div>
+        <div class="rep-metric-val">${mediaDor}<span style="font-size:0.9rem;font-weight:400;color:#888;">/5</span></div>
+        <div class="rep-metric-sub">${dorClass}</div>
+      </div>
+      <div class="rep-metric-card">
+        <div class="rep-patient-label">Qualidade do Sono</div>
+        <div class="rep-metric-val" style="color:#7A96A8;">${mediaSono}<span style="font-size:0.9rem;font-weight:400;color:#888;">/5</span></div>
+        <div class="rep-metric-sub">${sonoClass}</div>
+      </div>
+      <div class="rep-metric-card">
+        <div class="rep-patient-label">Nível de Estresse</div>
+        <div class="rep-metric-val" style="color:#4a4a4a;">${mediaEstresse}<span style="font-size:0.9rem;font-weight:400;color:#888;">/5</span></div>
+        <div class="rep-metric-sub">${estresseClass}</div>
+      </div>
+    </div>
+
+    <!-- Sintomas Mapeados -->
+    <div class="rep-section-title">1. Sintomas Relatados e Frequência Recorrente</div>
+    <div class="rep-tags-list">
+      ${sortedSintomas.length ? sortedSintomas.map(([sint, qtd]) => {
+        const pct = Math.round((qtd / total) * 100);
+        return `<span class="rep-tag ${pct >= 50 ? 'highlight' : ''}">${sint}: <strong>${pct}%</strong> (${qtd}x)</span>`;
+      }).join('') : '<span style="color:#888;font-size:0.8rem;">Nenhum sintoma específico registrado.</span>'}
+    </div>
+
+    <!-- Gatilhos Identificados -->
+    <div class="rep-section-title">2. Gatilhos Comportamentais e Ambientais Presentes</div>
+    <div class="rep-tags-list">
+      ${sortedGatilhos.length ? sortedGatilhos.map(([gat, qtd]) => {
+        const pct = Math.round((qtd / total) * 100);
+        return `<span class="rep-tag ${pct >= 50 ? 'highlight' : ''}">${gat}: <strong>${pct}%</strong> (${qtd}x)</span>`;
+      }).join('') : '<span style="color:#888;font-size:0.8rem;">Nenhum gatilho específico registrado.</span>'}
+    </div>
+
+    <!-- Tabela Cronológica -->
+    <div class="rep-section-title">3. Histórico dos Últimos Registros Diários</div>
+    <table class="rep-table">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Tensão</th>
+          <th>Sono</th>
+          <th>Estresse</th>
+          <th>Sintomas</th>
+          <th>Anotações da Paciente</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rowsHtml}
+      </tbody>
+    </table>
+
+    <!-- Termo e Espaço para o Clínico -->
+    <div class="rep-footer-disclaimer">
+      <strong>Nota Metodológica e Clínica:</strong> Este documento consolida registros prospectivos autorrelatados em ambiente digital através da plataforma <em>ATM Leve</em>. Os domínios avaliados são correlacionados aos critérios diagnósticos recomendados pelo <em>Consórcio Internacional DC/TMD</em> e pelo <em>Conselho Federal de Odontologia (CFO)</em>. Este documento é um instrumento auxiliar de triagem e acompanhamento longitudinal, não substituindo o exame físico palpatório, manobras articulares e diagnóstico clínico presencial especializado.
+    </div>
+
+    <div class="rep-sign-area">
+      <div style="font-size:0.75rem;color:#777;">
+        <div>Consultório Juiz de Fora — MG · Barra da Tijuca — RJ</div>
+        <div>Contato: (32) 99851-3101 · www.zaidansilveira.com.br</div>
+      </div>
+      <div class="rep-sign-box">
+        Dra. Vanessa Zaidan Silveira<br>
+        <span style="font-size:0.68rem;color:#777;">Cirurgiã Bucomaxilofacial · DTM/Dor Orofacial</span>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('report-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 
 // ============================================
