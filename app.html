@@ -2383,25 +2383,47 @@
 
     <div class="profile-body">
 
-      <!-- Assinatura -->
-      <div class="plan-card">
-        <div class="plan-badge">Plano Mensal</div>
-        <div class="plan-price"><sup>R$</sup>24<span style="font-size:1.5rem">,90</span></div>
-        <div class="plan-period">por mês · cancele quando quiser</div>
-        <ul class="plan-features">
-          <li>Check-in diário ilimitado</li>
-          <li>Todos os protocolos guiados</li>
-          <li>Botão SOS ATM</li>
-          <li>Rastreador de gatilhos</li>
-          <li>Histórico e insights semanais</li>
-          <li>Conteúdo educativo curado</li>
-          <li>Suporte entre consultas</li>
-        </ul>
-        <button class="btn-white" onclick="showToast('Em breve! Acesso antecipado disponível.')">Assinar agora →</button>
+      <!-- Perfil da Usuária -->
+      <div class="section-title" style="margin-top:0;">Meu perfil</div>
+      <div class="card">
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div class="flex-between">
+            <span style="font-size:0.9rem;color:var(--dark);">Nome</span>
+            <span style="font-size:0.9rem;color:var(--text-muted);font-weight:500;" id="profile-name-display">—</span>
+          </div>
+          <div class="divider" style="margin:0"></div>
+          <div class="flex-between">
+            <span style="font-size:0.9rem;color:var(--dark);">Check-ins realizados</span>
+            <span style="font-size:0.9rem;color:var(--burnt);font-weight:700;" id="profile-checkins">0</span>
+          </div>
+          <div class="divider" style="margin:0"></div>
+          <div class="flex-between">
+            <span style="font-size:0.9rem;color:var(--dark);">Protocolos feitos</span>
+            <span style="font-size:0.9rem;color:var(--burnt);font-weight:700;" id="profile-protocols">0</span>
+          </div>
+          <div class="divider" style="margin:0"></div>
+          <div class="flex-between">
+            <span style="font-size:0.9rem;color:var(--dark);">Sequência atual</span>
+            <span style="font-size:0.9rem;color:var(--burnt);font-weight:700;" id="profile-streak">🌱 Começando</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dossiê / Relatório Clínico para Consulta -->
+      <div class="card mt-16" style="border-left: 4px solid var(--burnt); background: #FAF8F5;">
+        <div class="card-label" style="color:var(--burnt); font-weight:700;">Dossiê do Paciente</div>
+        <div class="card-title" style="font-size:1.05rem; margin-bottom:6px;">Relatório Clínico Longitudinal</div>
+        <div class="card-desc" style="font-size:0.85rem; margin-bottom:14px; line-height:1.5;">
+          Gere um prontuário com o histórico das suas dores, sono, sintomas e gatilhos para levar à consulta com a Dra. Vanessa ou enviar pelo WhatsApp.
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <button class="btn-primary" style="padding:12px; font-size:0.9rem;" onclick="openClinicalReport()">📄 Visualizar / Salvar Relatório em PDF</button>
+          <button class="btn-card-outline" style="border-color:var(--burnt); color:var(--burnt); padding:10px; font-size:0.85rem;" onclick="shareReportWhatsApp()">📲 Enviar Resumo para a Dra. Vanessa</button>
+        </div>
       </div>
 
       <!-- Conteúdo Educativo -->
-      <div class="section-title mt-8">Aprenda com a Dra. Vanessa</div>
+      <div class="section-title mt-24">Aprenda com a Dra. Vanessa</div>
 
       <div class="edu-card" onclick="openEdu('atm')">
         <div class="edu-card-top">
@@ -2441,45 +2463,6 @@
           <div class="edu-title">Sinais de alerta: quando buscar ajuda</div>
         </div>
         <div class="edu-desc">Quando o autocuidado não é suficiente e você precisa de avaliação profissional.</div>
-      </div>
-
-      <!-- Perfil da Usuária -->
-      <div class="section-title mt-24">Meu perfil</div>
-      <div class="card">
-        <div style="display:flex;flex-direction:column;gap:14px;">
-          <div class="flex-between">
-            <span style="font-size:0.9rem;color:var(--dark);">Nome</span>
-            <span style="font-size:0.9rem;color:var(--text-muted);font-weight:500;" id="profile-name-display">—</span>
-          </div>
-          <div class="divider" style="margin:0"></div>
-          <div class="flex-between">
-            <span style="font-size:0.9rem;color:var(--dark);">Check-ins realizados</span>
-            <span style="font-size:0.9rem;color:var(--burnt);font-weight:700;" id="profile-checkins">0</span>
-          </div>
-          <div class="divider" style="margin:0"></div>
-          <div class="flex-between">
-            <span style="font-size:0.9rem;color:var(--dark);">Protocolos feitos</span>
-            <span style="font-size:0.9rem;color:var(--burnt);font-weight:700;" id="profile-protocols">0</span>
-          </div>
-          <div class="divider" style="margin:0"></div>
-          <div class="flex-between">
-            <span style="font-size:0.9rem;color:var(--dark);">Sequência atual</span>
-            <span style="font-size:0.9rem;color:var(--burnt);font-weight:700;" id="profile-streak">🌱 Começando</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Dossiê / Relatório Clínico para Consulta -->
-      <div class="card mt-16" style="border-left: 4px solid var(--burnt); background: #FAF8F5;">
-        <div class="card-label" style="color:var(--burnt); font-weight:700;">Dossiê do Paciente</div>
-        <div class="card-title" style="font-size:1.05rem; margin-bottom:6px;">Relatório Clínico Longitudinal</div>
-        <div class="card-desc" style="font-size:0.85rem; margin-bottom:14px; line-height:1.5;">
-          Gere um prontuário com o histórico das suas dores, sono, sintomas e gatilhos para levar à consulta com a Dra. Vanessa ou enviar pelo WhatsApp.
-        </div>
-        <div style="display:flex; flex-direction:column; gap:8px;">
-          <button class="btn-primary" style="padding:12px; font-size:0.9rem;" onclick="openClinicalReport()">📄 Visualizar / Salvar Relatório em PDF</button>
-          <button class="btn-card-outline" style="border-color:var(--burnt); color:var(--burnt); padding:10px; font-size:0.85rem;" onclick="shareReportWhatsApp()">📲 Enviar Resumo para a Dra. Vanessa</button>
-        </div>
       </div>
 
       <div class="disclaimer-box mt-16">
