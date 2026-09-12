@@ -1625,12 +1625,74 @@
     padding-top: 4px;
   }
 
-  /* Impressão direta */
+  /* Responsividade para Celular / Telas Pequenas */
+  @media (max-width: 600px) {
+    .report-overlay {
+      padding: 12px 8px;
+    }
+    .report-container {
+      margin: 10px auto 40px;
+    }
+    .report-paper {
+      padding: 24px 16px;
+      border-radius: 10px;
+    }
+    .report-actions-bar {
+      flex-direction: column;
+      gap: 8px;
+    }
+    .btn-print, .btn-close-report {
+      width: 100%;
+      justify-content: center;
+      padding: 12px;
+      font-size: 0.95rem;
+    }
+    .rep-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .rep-logo-title {
+      font-size: 1.25rem;
+    }
+    .rep-doc-meta {
+      text-align: left;
+    }
+    .rep-patient-bar {
+      flex-direction: column;
+      gap: 10px;
+      padding: 12px;
+    }
+    .rep-metrics-grid {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .rep-table {
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .rep-sign-area {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 24px;
+    }
+    .rep-sign-box {
+      width: 100%;
+      max-width: 240px;
+    }
+  }
+
+  /* Impressão Direta e Exportação em PDF Limpa (1 a 2 páginas A4) */
   @media print {
-    body, html {
-      background: #fff !important;
-      padding: 0 !important;
+    html, body {
+      background: #ffffff !important;
+      color: #000000 !important;
       margin: 0 !important;
+      padding: 0 !important;
+      width: 100% !important;
+      height: auto !important;
+      font-size: 10pt !important;
     }
     #app, .bottom-nav, .nav, .toast, .report-actions-bar {
       display: none !important;
@@ -1639,21 +1701,61 @@
       display: block !important;
       position: static !important;
       padding: 0 !important;
+      margin: 0 !important;
       background: transparent !important;
       width: 100% !important;
       height: auto !important;
+      overflow: visible !important;
     }
     .report-container {
       max-width: 100% !important;
+      width: 100% !important;
       margin: 0 !important;
+      padding: 0 !important;
     }
     .report-paper {
       box-shadow: none !important;
+      border: none !important;
       border-radius: 0 !important;
       padding: 0 !important;
+      margin: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+    .rep-header {
+      display: flex !important;
+      flex-direction: row !important;
+      justify-content: space-between !important;
+      align-items: flex-start !important;
+      border-bottom: 2px solid #C4622D !important;
+    }
+    .rep-doc-meta {
+      text-align: right !important;
+    }
+    .rep-patient-bar {
+      display: flex !important;
+      flex-direction: row !important;
+      justify-content: space-between !important;
+      background: #f5f5f5 !important;
+      border: 1px solid #ddd !important;
+    }
+    .rep-metrics-grid {
+      display: grid !important;
+      grid-template-columns: repeat(3, 1fr) !important;
+      gap: 12px !important;
+    }
+    .rep-table {
+      display: table !important;
+      width: 100% !important;
+    }
+    .rep-sign-area {
+      display: flex !important;
+      flex-direction: row !important;
+      justify-content: space-between !important;
+      align-items: flex-end !important;
     }
     @page {
-      margin: 1.2cm;
+      margin: 1.2cm 1.5cm;
       size: A4 portrait;
     }
   }
@@ -2505,25 +2607,25 @@
     </div>
   </div>
 
-  <!-- ======================================
-       MODAL: Relatório Clínico Longitudinal
-  ======================================= -->
-  <div class="report-overlay" id="report-modal">
-    <div class="report-container">
-      <div class="report-actions-bar">
-        <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Salvar em PDF</button>
-        <button class="btn-close-report" onclick="closeClinicalReport()">✕ Fechar</button>
-      </div>
-      <div class="report-paper" id="report-printable-area">
-        <!-- Preenchido via JavaScript -->
-      </div>
-    </div>
-  </div>
-
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
 </div><!-- #app -->
+
+<!-- ======================================
+     MODAL: Relatório Clínico Longitudinal (isolado fora de #app para impressão e PDF perfeitos)
+======================================= -->
+<div class="report-overlay" id="report-modal">
+  <div class="report-container">
+    <div class="report-actions-bar">
+      <button class="btn-print" onclick="window.print()">🖨️ Imprimir / Salvar em PDF</button>
+      <button class="btn-close-report" onclick="closeClinicalReport()">✕ Fechar</button>
+    </div>
+    <div class="report-paper" id="report-printable-area">
+      <!-- Preenchido via JavaScript -->
+    </div>
+  </div>
+</div>
 
 <script>
 // ============================================
